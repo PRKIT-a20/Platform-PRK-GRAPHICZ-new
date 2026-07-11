@@ -1,0 +1,5 @@
+{
+  "name": "PRK Graphicz SaaS",
+  "description": "A production-ready design subscription platform for startups, featuring a client portal, request tracking, and automated billing. Integrated with Supabase for scalable data storage.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" class="bg-white">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only">
+    <title>PRK GRAPHICZ</title>
+    <script>
+      /**
+       * Force Light Mode Globally
+       * 
+       * This script ensures the website consistently displays in light mode by:
+       * 1. Removing the 'dark' class from the document root.
+       * 2. Injecting CSS to override all backgrounds and text colors to the specified light theme.
+       * 3. Using a MutationObserver to enforce these styles on dynamically added content.
+       * 4. Overriding system-level color-scheme preferences.
+       */
+      (function() {
+        // 1. Immediately remove 'dark' class and set theme attribute
+        document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
+
+        // 2. Inject CSS to override backgrounds, text, and pseudo-elements
+        const style = document.createElement('style');
+        style.textContent = `
+          /* Force light theme colors on root elements */
+          html, body {
+            background-color: #fcfcfc !important;
+            color: #1a1a1a !important;
+            color-scheme: light !important;
+          }
+        `;
+        document.head.appendChild(style);
+
+        // 3. MutationObserver to handle dynamically added content and attribute changes
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            // Remove 'dark' class if added dynamically
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const target = mutation.target;
+              if (target instanceof HTMLElement && target.classList.contains('dark')) {
+                target.classList.remove('dark');
+              }
+            }
+          });
+        });
+
+        // Observe the entire document for class changes
+        observer.observe(document.documentElement, {
+          attributes: true,
+          subtree: true,
+          attributeFilter: ['class']
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
