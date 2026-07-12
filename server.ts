@@ -141,6 +141,15 @@ async function startServer() {
     }
   });
 
+  app.put('/api/users/:id', async (req, res) => {
+    try {
+      const updatedRow = await db.update(users).set(req.body).where(eq(users.id, req.params.id)).returning();
+      res.json({ data: updatedRow[0] });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update user' });
+    }
+  });
+
   // Vite middleware
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

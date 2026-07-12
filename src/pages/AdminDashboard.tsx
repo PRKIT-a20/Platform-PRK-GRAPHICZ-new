@@ -91,9 +91,9 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const [reqRes, contactsRes, usersRes] = await Promise.all([
-        localDb.from('requests').select('*').order('created_at', { ascending: false }),
-        localDb.from('contact_submissions').select('*').order('created_at', { ascending: false }),
-        localDb.from('users').select('*').order('created_at', { ascending: false })
+        fetch('/api/requests').then(res => res.json()),
+        fetch('/api/contact_submissions').then(res => res.json()),
+        fetch('/api/users').then(res => res.json())
       ]);
       
       const reqData = reqRes.data || [];
@@ -121,16 +121,15 @@ const AdminDashboard = () => {
     if (!selectedRequest) return;
     setUpdating(true);
     try {
-      const { error } = await localDb
-        .from('requests')
-        .update({ 
+      await fetch(`/api/requests/${selectedRequest.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
           status: newStatus, 
           delivery_url: deliveryUrl,
           review_count: newReviewCount
-        })
-        .eq('id', selectedRequest.id);
-
-      if (error) throw error;
+        }),
+      });
       
       setSelectedRequest(null);
       fetchData();
@@ -145,11 +144,11 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, status: newStatus as any } : req));
     try {
-      const { error } = await localDb
-        .from('requests')
-        .update({ status: newStatus })
-        .eq('id', id);
-      if (error) throw error;
+      await fetch(`/api/requests/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
     } catch (error) {
       console.error('Failed to update status:', error);
       fetchData(); // Revert on error
@@ -160,11 +159,11 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, review_count: newCount } : req));
     try {
-      const { error } = await localDb
-        .from('requests')
-        .update({ review_count: newCount })
-        .eq('id', id);
-      if (error) throw error;
+      await fetch(`/api/requests/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ review_count: newCount }),
+      });
     } catch (error) {
       console.error('Failed to update review count:', error);
       fetchData(); // Revert on error
@@ -496,7 +495,10 @@ const AdminDashboard = () => {
               <h2 className="font-bold text-xl">Client Content Planner</h2>
               <select 
                 value={plannerUserId}
-                onChange={(e) => setPlannerUserId(e.target.value)}
+                onChange={(e) => {
+                  console.log("Selected user ID:", e.target.value);
+                  setPlannerUserId(e.target.value);
+                }}
                 className="w-full md:w-auto px-4 py-2 bg-black/5 rounded-xl border border-transparent outline-none focus:border-brand-primary"
               >
                 <option value="">Select a client</option>
@@ -742,15 +744,14 @@ const AdminDashboard = () => {
                   onClick={async () => {
                     setUpdating(true);
                     try {
-                      const { error } = await localDb
-                        .from('users')
-                        .update({ 
+                      await fetch(`/api/users/${selectedUser.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
                           role: selectedUser.role, 
                           subscription_status: selectedUser.subscription_status 
-                        })
-                        .eq('id', selectedUser.id);
-
-                      if (error) throw error;
+                        }),
+                      });
                       
                       setSelectedUser(null);
                       fetchData();
