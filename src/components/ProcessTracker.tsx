@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 import { 
   Inbox, 
   PenTool, 

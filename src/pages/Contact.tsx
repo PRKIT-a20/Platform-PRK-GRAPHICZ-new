@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Quote, CheckCircle2, Award, Zap, Smile, ThumbsUp, Target, TrendingUp, MessageCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 
 const testimonials = [
   {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 import Logo from '../components/Logo';
 import { 
   Plus, 

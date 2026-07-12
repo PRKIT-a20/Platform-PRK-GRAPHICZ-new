@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, X, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 
 interface ReceiptUploadProps {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 import { Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 
 interface ContentPlannerRow {

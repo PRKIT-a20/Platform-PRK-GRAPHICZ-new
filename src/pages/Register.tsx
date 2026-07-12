@@ -1,125 +1,80 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
-import { motion } from 'motion/react';
+import { Mail, Lock, ArrowRight, ArrowLeft, Loader2, User, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Logo from '../components/Logo';
-import AuthDivider from '../components/AuthDivider';
-import { Mail, Lock, ArrowRight, Loader2, User, Eye, EyeOff, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { AuthDivider } from '../components/AuthDivider';
+import { useAuth } from '../context/AuthContext';
+
+const validatePassword = (password: string) => {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  
+  if (score < 2) return { score, label: 'Weak', color: 'bg-red-500' };
+  if (score < 3) return { score, label: 'Fair', color: 'bg-yellow-500' };
+  if (score < 4) return { score, label: 'Good', color: 'bg-blue-500' };
+  return { score, label: 'Strong', color: 'bg-green-500' };
+};
 
 const Register = () => {
-  const [step, setStep] = useState<'register' | 'verify'>('register');
-  const [role, setRole] = useState<'client' | 'admin'>('client');
-  const [fullName, setFullName] = useState('');
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useAuth();
+  const [error, setError] = useState('');
+  const [step, setStep] = useState<'register' | 'confirm'>('register');
 
   useEffect(() => {
     if (user) {
-      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [user, navigate]);
 
-  const getPasswordStrength = (pass: string) => {
-    if (!pass) return { score: 0, label: '', color: 'bg-black/5' };
-    let score = 0;
-    if (pass.length >= 8) score += 1;
-    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score += 1;
-    if (/[0-9]/.test(pass)) score += 1;
-    if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+  const strength = validatePassword(password);
 
-    switch (score) {
-      case 0:
-      case 1: return { score: 1, label: 'Weak', color: 'bg-red-500' };
-      case 2: return { score: 2, label: 'Fair', color: 'bg-yellow-500' };
-      case 3: return { score: 3, label: 'Good', color: 'bg-blue-500' };
-      case 4: return { score: 4, label: 'Strong', color: 'bg-green-500' };
-      default: return { score: 0, label: '', color: 'bg-black/5' };
-    }
-  };
-
-  const strength = getPasswordStrength(password);
-
-  const handleGoogleSignUp = async () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
-    try {
-      const finalRole = role === 'admin' ? 'admin' : 'client';
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || 'Google sign up failed');
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Email domain validation
-    const allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com'];
-    const emailDomain = email.split('@')[1]?.toLowerCase();
-    
-    if (!allowedDomains.includes(emailDomain)) {
-      setError('Please use a valid personal email (Gmail, Outlook, Hotmail, or Yahoo)');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return;
-    }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
       return;
     }
-    setLoading(true);
-    setError('');
 
-    try {
-      const finalRole = (email.toLowerCase() === 'prkgraphicz@gmail.com' || role === 'admin') ? 'admin' : 'client';
-      
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: finalRole,
-            full_name: fullName
-          }
-        }
-      });
-
-      if (signUpError) throw signUpError;
-
-      // If email confirmation is required, show verify step
-      if (data.user && data.user.identities && data.user.identities.length === 0) {
-        setError('Email already in use. Please log in.');
-      } else {
-        setStep('verify');
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    if (strength.score < 2) {
+      setError('Please choose a stronger password');
       setLoading(false);
+      return;
     }
+
+    // Mock registration logic
+    setTimeout(() => {
+      setLoading(false);
+      
+      // We automatically login the user for this mock
+      login('dummy-token', {
+         id: 'user-' + Math.random().toString(36).substr(2, 9),
+         email,
+         role: 'client',
+         full_name: fullName
+      });
+      setStep('confirm');
+    }, 500);
   };
 
   return (
@@ -150,82 +105,21 @@ const Register = () => {
             <Logo />
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mb-2">
-            {step === 'register' ? 'Get Started' : 'Check Your Email'}
+            {step === 'register' ? 'Create an account' : 'Check your email'}
           </h1>
-          <p className="text-black/40 font-medium">
-            {step === 'register' 
-              ? 'Create your account to start a project' 
-              : `We've sent a confirmation link to ${email}`}
+          <p className="text-sm font-medium text-black/40">
+            {step === 'register' ? 'Join the client portal to manage your projects' : 'We sent a verification link'}
           </p>
-          {step === 'register' && (
-            <div className="flex items-center justify-center p-1 bg-black/5 rounded-2xl mt-6">
-              <button 
-                type="button"
-                onClick={() => setRole('client')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${
-                  role === 'client' 
-                    ? 'bg-white text-black shadow-sm' 
-                    : 'text-black/40 hover:text-black/60'
-                }`}
-              >
-                <User size={14} />
-                Client
-              </button>
-              <button 
-                type="button"
-                onClick={() => setRole('admin')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${
-                  role === 'admin' 
-                    ? 'bg-brand-primary text-brand-secondary shadow-sm' 
-                    : 'text-black/40 hover:text-brand-primary'
-                }`}
-              >
-                <ShieldCheck size={14} />
-                Admin
-              </button>
-            </div>
-          )}
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-500 text-sm font-bold rounded-xl border border-red-100">
+          <div className="mb-6 p-4 text-sm font-bold rounded-xl border bg-red-50 text-red-500 border-red-100">
             {error}
           </div>
         )}
 
         {step === 'register' ? (
           <>
-            <div className="mb-6">
-              <button
-                type="button"
-                onClick={handleGoogleSignUp}
-                disabled={loading}
-                className="w-full py-4 bg-white border border-black/10 text-black rounded-2xl font-bold text-lg hover:bg-black/5 transition-all flex items-center justify-center gap-3 shadow-sm disabled:opacity-50"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Continue with Google
-              </button>
-            </div>
-
-            <AuthDivider subtext="or sign up with email" />
-
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-2">Full Name</label>
@@ -255,9 +149,6 @@ const Register = () => {
                     placeholder="yourname@gmail.com"
                   />
                 </div>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-black/20">
-                  Accepted: Gmail, Outlook, Hotmail, Yahoo
-                </p>
               </div>
 
               <div>
@@ -294,24 +185,6 @@ const Register = () => {
                           }`}
                         />
                       ))}
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
-                      <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${password.length >= 8 ? 'text-green-500' : 'text-black/20'}`}>
-                        <div className={`w-1 h-1 rounded-full ${password.length >= 8 ? 'bg-green-500' : 'bg-black/20'}`} />
-                        8+ Characters
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${/[A-Z]/.test(password) && /[a-z]/.test(password) ? 'text-green-500' : 'text-black/20'}`}>
-                        <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(password) && /[a-z]/.test(password) ? 'bg-green-500' : 'bg-black/20'}`} />
-                        Mixed Case
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${/[0-9]/.test(password) ? 'text-green-500' : 'text-black/20'}`}>
-                        <div className={`w-1 h-1 rounded-full ${/[0-9]/.test(password) ? 'bg-green-500' : 'bg-black/20'}`} />
-                        Numbers
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${/[^A-Za-z0-9]/.test(password) ? 'text-green-500' : 'text-black/20'}`}>
-                        <div className={`w-1 h-1 rounded-full ${/[^A-Za-z0-9]/.test(password) ? 'bg-green-500' : 'bg-black/20'}`} />
-                        Special Char
-                      </div>
                     </div>
                   </div>
                 )}
@@ -356,19 +229,16 @@ const Register = () => {
         ) : (
           <div className="space-y-6">
             <div className="p-6 bg-black/5 rounded-2xl text-center">
+              <CheckCircle2 size={48} className="mx-auto text-green-500 mb-4" />
               <p className="text-sm font-medium text-black/60 mb-4">
-                Please check your email inbox and click the confirmation link to verify your account.
-              </p>
-              <p className="text-xs text-black/40">
-                If you don't see it, check your spam folder.
+                Mock registration successful! You are now logged in.
               </p>
             </div>
-
             <Link
-              to="/login"
+              to="/dashboard"
               className="w-full py-4 bg-brand-primary text-brand-secondary rounded-2xl font-bold text-lg hover:bg-brand-secondary hover:text-brand-primary transition-all flex items-center justify-center gap-2 shadow-xl shadow-brand-primary/10"
             >
-              Go to Login
+              Go to Dashboard
               <ArrowRight size={20} />
             </Link>
           </div>

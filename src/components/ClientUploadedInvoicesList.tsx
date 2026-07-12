@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { localDb as supabase } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, Download } from 'lucide-react';
 import { format } from 'date-fns';
