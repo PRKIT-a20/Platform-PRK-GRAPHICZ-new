@@ -129,12 +129,29 @@ async function startServer() {
     }
   });
 
+  app.post('/api/register', async (req, res) => {
+    try {
+      const { email, full_name, role } = req.body;
+      const newUser = await db.insert(users).values({
+        email,
+        full_name,
+        role: role || 'client',
+        subscription_status: 'free',
+        is_verified: false
+      }).returning();
+      res.json({ data: newUser[0] });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to register user' });
+    }
+  });
+
   // Users Routes
   app.get('/api/users', async (req, res) => {
     try {
       const data = await db.query.users.findMany({
         orderBy: desc(users.created_at),
       });
+      console.log("Users in DB:", data);
       res.json({ data });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch users' });

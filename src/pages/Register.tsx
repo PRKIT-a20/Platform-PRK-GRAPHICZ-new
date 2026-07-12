@@ -45,7 +45,7 @@ const Register = () => {
 
   const strength = validatePassword(password);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -62,19 +62,23 @@ const Register = () => {
       return;
     }
 
-    // Mock registration logic
-    setTimeout(() => {
-      setLoading(false);
-      
-      // We automatically login the user for this mock
-      login('dummy-token', {
-         id: 'user-' + Math.random().toString(36).substr(2, 9),
-         email,
-         role: 'client',
-         full_name: fullName
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, full_name: fullName, role: 'client' }),
       });
+      const { data } = await response.json();
+      
+      if (!data) throw new Error('Registration failed');
+      
+      login('dummy-token', data);
       setStep('confirm');
-    }, 500);
+    } catch (err) {
+      setError('Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -42,6 +42,11 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
     }
   };
 
+  const startEditing = (row: ContentPlannerRow) => {
+    setEditingId(row.id);
+    setEditForm(row);
+  };
+
   const handleAdd = async () => {
     try {
       const newRow = {

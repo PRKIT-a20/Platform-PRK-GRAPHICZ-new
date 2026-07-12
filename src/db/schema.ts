@@ -1,7 +1,7 @@
-import { pgTable, text, timestamp, uuid, boolean, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, integer, serial } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: serial('id').primaryKey(), // Changed to serial based on error
   email: text('email').notNull().unique(),
   full_name: text('full_name'),
   role: text('role').default('client').notNull(),
@@ -12,7 +12,7 @@ export const users = pgTable('users', {
 
 export const requests = pgTable('requests', {
   id: uuid('id').primaryKey().defaultRandom(),
-  user_id: uuid('user_id').references(() => users.id).notNull(),
+  user_id: integer('user_id').references(() => users.id).notNull(),
   title: text('title').notNull(),
   description: text('description').notNull(),
   status: text('status').default('pending').notNull(),
@@ -22,6 +22,7 @@ export const requests = pgTable('requests', {
   review_count: integer('review_count').default(0),
   product_type: text('product_type'),
 });
+// ... rest of the tables similarly ...
 
 export const contact_submissions = pgTable('contact_submissions', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -35,7 +36,7 @@ export const contact_submissions = pgTable('contact_submissions', {
 
 export const content_planner = pgTable('content_planner', {
   id: uuid('id').primaryKey().defaultRandom(),
-  user_id: uuid('user_id').references(() => users.id).notNull(),
+  user_id: integer('user_id').references(() => users.id).notNull(),
   post_date: text('post_date'),
   content_pillar: text('content_pillar'),
   boost: text('boost'),

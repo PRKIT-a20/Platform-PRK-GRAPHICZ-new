@@ -99,6 +99,7 @@ const AdminDashboard = () => {
       const reqData = reqRes.data || [];
       const contactsData = contactsRes.data || [];
       const usersData = usersRes.data || [];
+      console.log("Users fetched:", usersData.length, usersData);
       
       setRequests(reqData);
       setContacts(contactsData);
