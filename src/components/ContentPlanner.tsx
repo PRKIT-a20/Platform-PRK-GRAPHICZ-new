@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { localDb } from '../lib/localStorageDb';
 import { Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 
 interface ContentPlannerRow {
@@ -33,13 +32,8 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   const fetchPlanner = async () => {
     setLoading(true);
     try {
-      const { data, error } = await localDb
-        .from('content_planner')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
+      const response = await fetch(`/api/content_planner/${userId}`);
+      const { data } = await response.json();
       setRows(data || []);
     } catch (err) {
       console.error('Error fetching content planner:', err);
@@ -62,8 +56,12 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
         notice: '',
         scheduled_date: ''
       };
-      const { data, error } = await localDb.from('content_planner').insert(newRow);
-      if (error) throw error;
+      const response = await fetch('/api/content_planner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRow),
+      });
+      const { data } = await response.json();
       if (data && data[0]) {
         setRows(prev => [data[0], ...prev]);
         startEditing(data[0]);
@@ -73,20 +71,14 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
     }
   };
 
-  const startEditing = (row: ContentPlannerRow) => {
-    setEditingId(row.id);
-    setEditForm(row);
-  };
-
   const handleSave = async () => {
     if (!editingId) return;
     try {
-      const { error } = await localDb
-        .from('content_planner')
-        .update(editForm)
-        .eq('id', editingId);
-        
-      if (error) throw error;
+      await fetch(`/api/content_planner/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      });
       setRows(prev => prev.map(r => r.id === editingId ? { ...r, ...editForm } as ContentPlannerRow : r));
       setEditingId(null);
     } catch (err) {
@@ -97,8 +89,7 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this row?')) return;
     try {
-      const { error } = await localDb.from('content_planner').delete().eq('id', id);
-      if (error) throw error;
+      await fetch(`/api/content_planner/${id}`, { method: 'DELETE' });
       setRows(prev => prev.filter(r => r.id !== id));
     } catch (err) {
       console.error('Failed to delete', err);
