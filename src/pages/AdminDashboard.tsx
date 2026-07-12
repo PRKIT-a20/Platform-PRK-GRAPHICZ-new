@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import Logo from '../components/Logo';
 import { 
   Users, 
@@ -91,9 +91,9 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const [reqRes, contactsRes, usersRes] = await Promise.all([
-        supabase.from('requests').select('*').order('created_at', { ascending: false }),
-        supabase.from('contact_submissions').select('*').order('created_at', { ascending: false }),
-        supabase.from('users').select('*').order('created_at', { ascending: false })
+        localDb.from('requests').select('*').order('created_at', { ascending: false }),
+        localDb.from('contact_submissions').select('*').order('created_at', { ascending: false }),
+        localDb.from('users').select('*').order('created_at', { ascending: false })
       ]);
       
       const reqData = reqRes.data || [];
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
     if (!selectedRequest) return;
     setUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .update({ 
           status: newStatus, 
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, status: newStatus as any } : req));
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .update({ status: newStatus })
         .eq('id', id);
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, review_count: newCount } : req));
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .update({ review_count: newCount })
         .eq('id', id);
@@ -742,7 +742,7 @@ const AdminDashboard = () => {
                   onClick={async () => {
                     setUpdating(true);
                     try {
-                      const { error } = await supabase
+                      const { error } = await localDb
                         .from('users')
                         .update({ 
                           role: selectedUser.role, 

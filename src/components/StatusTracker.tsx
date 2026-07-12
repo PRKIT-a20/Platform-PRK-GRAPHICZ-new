@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 import { Clock, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -24,7 +24,7 @@ export default function StatusTracker() {
 
   const fetchReceipts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('receipts')
         .select('*')
         .eq('user_id', user?.id)

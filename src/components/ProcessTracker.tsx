@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { 
   Inbox, 
   PenTool, 
@@ -39,7 +39,7 @@ const ProcessTracker: React.FC<ProcessTrackerProps> = ({ userId }) => {
     // 1. Initiële data ophalen
     const fetchRequests = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await localDb
           .from('requests')
           .select('id, project_nr, title, status, review_count')
           .eq('user_id', userId)
@@ -58,7 +58,7 @@ const ProcessTracker: React.FC<ProcessTrackerProps> = ({ userId }) => {
     fetchRequests();
 
     // 2. Real-time updates instellen via Supabase Channels
-    const channel = supabase
+    const channel = localDb
       .channel('public:requests')
       .on(
         'postgres_changes',
@@ -81,7 +81,7 @@ const ProcessTracker: React.FC<ProcessTrackerProps> = ({ userId }) => {
 
     // Cleanup bij unmount
     return () => {
-      supabase.removeChannel(channel);
+      localDb.removeChannel(channel);
     };
   }, [userId]);
 

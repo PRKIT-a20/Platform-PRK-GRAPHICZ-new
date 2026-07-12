@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, Download } from 'lucide-react';
 import { format } from 'date-fns';
@@ -29,7 +29,7 @@ export default function ClientUploadedInvoicesList({ refreshTrigger }: ClientUpl
 
   const fetchInvoices = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('client_invoices')
         .select('*')
         .eq('user_id', user?.id)
@@ -46,7 +46,7 @@ export default function ClientUploadedInvoicesList({ refreshTrigger }: ClientUpl
 
   const handleDownload = async (fileUrl: string) => {
     try {
-      const { data, error } = await supabase.storage
+      const { data, error } = await localDb.storage
         .from('invoices')
         .createSignedUrl(fileUrl, 60 * 60);
 

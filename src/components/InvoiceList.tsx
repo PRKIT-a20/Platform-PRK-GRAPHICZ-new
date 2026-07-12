@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 import { Download, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -26,7 +26,7 @@ export default function InvoiceList() {
 
   const fetchInvoices = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('invoices')
         .select('*')
         .eq('user_id', user?.id)

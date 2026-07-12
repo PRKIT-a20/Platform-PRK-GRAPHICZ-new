@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { Loader2 } from 'lucide-react';
 
 interface Brand {
@@ -28,7 +28,7 @@ const SmartRequestForm: React.FC<SmartRequestFormProps> = ({ onSuccess, onCancel
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await localDb
           .from('brands')
           .select('id, name')
           .order('name');
@@ -61,7 +61,7 @@ const SmartRequestForm: React.FC<SmartRequestFormProps> = ({ onSuccess, onCancel
 
     try {
       // Logic: stuur data naar 'requests' tabel met status 'Submitted'
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .insert([
           {

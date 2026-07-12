@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 
 interface ClientInvoiceUploadProps {
@@ -34,14 +34,14 @@ export default function ClientInvoiceUpload({ onUploadSuccess }: ClientInvoiceUp
 
     try {
       // 1. Upload file to Supabase Storage
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError, data } = await localDb.storage
         .from('invoices')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       // 2. Insert record into invoices table
-      const { error: dbError } = await supabase
+      const { error: dbError } = await localDb
         .from('client_invoices')
         .insert([
           {

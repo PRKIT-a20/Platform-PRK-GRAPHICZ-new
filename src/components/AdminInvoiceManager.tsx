@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { Download, Loader2, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -23,7 +23,7 @@ export default function AdminInvoiceManager() {
 
   const fetchInvoices = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('client_invoices')
         .select('*')
         .order('created_at', { ascending: false });
@@ -39,7 +39,7 @@ export default function AdminInvoiceManager() {
 
   const handleDownload = async (fileUrl: string) => {
     try {
-      const { data, error } = await supabase.storage
+      const { data, error } = await localDb.storage
         .from('invoices')
         .createSignedUrl(fileUrl, 60 * 60); // 1 hour expiry
 
@@ -56,7 +56,7 @@ export default function AdminInvoiceManager() {
   const handleStatusChange = async (id: string, newStatus: 'Pending' | 'Paid' | 'Rejected') => {
     setUpdating(id);
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('client_invoices')
         .update({ status: newStatus })
         .eq('id', id);
@@ -82,7 +82,7 @@ export default function AdminInvoiceManager() {
     setUpdating(id);
     try {
       // 1. Delete from storage
-      const { error: storageError } = await supabase.storage
+      const { error: storageError } = await localDb.storage
         .from('invoices')
         .remove([fileUrl]);
 
@@ -91,7 +91,7 @@ export default function AdminInvoiceManager() {
       }
 
       // 2. Delete from database
-      const { error: dbError } = await supabase
+      const { error: dbError } = await localDb
         .from('client_invoices')
         .delete()
         .eq('id', id);

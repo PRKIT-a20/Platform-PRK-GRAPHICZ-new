@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 
 interface ContentPlannerRow {
@@ -33,7 +33,7 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   const fetchPlanner = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('content_planner')
         .select('*')
         .eq('user_id', userId)
@@ -62,7 +62,7 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
         notice: '',
         scheduled_date: ''
       };
-      const { data, error } = await supabase.from('content_planner').insert(newRow);
+      const { data, error } = await localDb.from('content_planner').insert(newRow);
       if (error) throw error;
       if (data && data[0]) {
         setRows(prev => [data[0], ...prev]);
@@ -81,7 +81,7 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   const handleSave = async () => {
     if (!editingId) return;
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('content_planner')
         .update(editForm)
         .eq('id', editingId);
@@ -97,7 +97,7 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this row?')) return;
     try {
-      const { error } = await supabase.from('content_planner').delete().eq('id', id);
+      const { error } = await localDb.from('content_planner').delete().eq('id', id);
       if (error) throw error;
       setRows(prev => prev.filter(r => r.id !== id));
     } catch (err) {

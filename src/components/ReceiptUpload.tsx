@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, X, Loader2 } from 'lucide-react';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import { useAuth } from '../context/AuthContext';
 
 interface ReceiptUploadProps {
@@ -38,14 +38,14 @@ export default function ReceiptUpload({ onUploadSuccess }: ReceiptUploadProps) {
 
     try {
       // 1. Upload PDF to Storage
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError, data } = await localDb.storage
         .from('payment-proofs')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       // 2. Insert into receipts table
-      const { error: dbError } = await supabase
+      const { error: dbError } = await localDb
         .from('receipts')
         .insert([
           {

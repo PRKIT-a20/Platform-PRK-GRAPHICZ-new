@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { localDb as supabase } from '../lib/localStorageDb';
+import { localDb } from '../lib/localStorageDb';
 import Logo from '../components/Logo';
 import { 
   Plus, 
@@ -74,7 +74,7 @@ const Dashboard = () => {
 
   const fetchRequests = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await localDb
         .from('requests')
         .select('*')
         .eq('user_id', user?.id)
@@ -94,7 +94,7 @@ const Dashboard = () => {
     if (!user) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .insert([
           { 
@@ -122,7 +122,7 @@ const Dashboard = () => {
     if (!requestToDelete) return;
     
     try {
-      const { error } = await supabase
+      const { error } = await localDb
         .from('requests')
         .delete()
         .eq('id', requestToDelete);
