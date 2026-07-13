@@ -37,17 +37,18 @@ import ClientUploadedInvoicesList from '../components/ClientUploadedInvoicesList
 import { motion, AnimatePresence } from 'motion/react';
 import { format } from 'date-fns';
 
-import ProcessTracker from '../components/ProcessTracker';
+import { ProcessTracker } from '../components/ProcessTracker';
 import SmartRequestForm from '../components/SmartRequestForm';
 
 // Client Modular Components (Phase 2B)
 import { ClientOverview } from '../components/ClientOverview';
 import { ClientRequestPanel } from '../components/ClientRequestPanel';
 import { ClientProjectsPanel } from '../components/ClientProjectsPanel';
-import { ClientBrandVault } from '../components/ClientBrandVault';
-import { ClientProofingGallery } from '../components/ClientProofingGallery';
-import { ClientStrategyBoard } from '../components/ClientStrategyBoard';
-import { ClientResourceWiki } from '../components/ClientResourceWiki';
+import { BrandVault } from '../components/BrandVault';
+import { ProofingGallery } from '../components/ProofingGallery';
+import { StrategyBoard } from '../components/StrategyBoard';
+import { ResourceWiki } from '../components/ResourceWiki';
+import { ClientCommunication } from '../components/ClientCommunication';
 import { ClientBillingReceipts } from '../components/ClientBillingReceipts';
 
 interface Request {
@@ -71,7 +72,7 @@ const Dashboard = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [invoiceRefresh, setInvoiceRefresh] = useState(0);
-  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'planner' | 'billing' | 'projects' | 'vault' | 'proofing' | 'strategy' | 'wiki' | 'roadmap' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'planner' | 'billing' | 'projects' | 'vault' | 'proofing' | 'strategy' | 'wiki' | 'communication' | 'roadmap' | 'settings'>('overview');
   
   // Custom modal states
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
@@ -250,6 +251,13 @@ const Dashboard = () => {
             Resource Wiki
           </button>
           <button 
+            onClick={() => handleTabClick('communication')}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'communication' ? 'bg-brand-primary text-brand-secondary' : 'text-black/40 hover:bg-black/5'}`}
+          >
+            <MessageSquare size={18} />
+            Communication Hub
+          </button>
+          <button 
             onClick={() => handleTabClick('roadmap')}
             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'roadmap' ? 'bg-brand-primary text-brand-secondary' : 'text-black/40 hover:bg-black/5'}`}
           >
@@ -340,13 +348,15 @@ const Dashboard = () => {
         ) : activeTab === 'projects' ? (
           <ClientProjectsPanel />
         ) : activeTab === 'vault' ? (
-          <ClientBrandVault />
+          <BrandVault />
         ) : activeTab === 'proofing' ? (
-          <ClientProofingGallery />
+          <ProofingGallery />
         ) : activeTab === 'strategy' ? (
-          <ClientStrategyBoard />
+          <StrategyBoard />
         ) : activeTab === 'wiki' ? (
-          <ClientResourceWiki />
+          <ResourceWiki />
+        ) : activeTab === 'communication' ? (
+          <ClientCommunication />
         ) : activeTab === 'billing' ? (
           <ClientBillingReceipts />
         ) : activeTab === 'roadmap' ? (

@@ -21,10 +21,27 @@ import {
   Menu,
   X,
   CreditCard,
-  Key
+  Key,
+  LayoutDashboard,
+  Briefcase,
+  Layers,
+  BookOpen,
+  Activity,
+  Heart
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { format } from 'date-fns';
+import { AdminOverview } from '../components/AdminOverview';
+import { AdminRequests } from '../components/admin/AdminRequests';
+import { AdminClients } from '../components/admin/AdminClients';
+import { AdminDesigners } from '../components/admin/AdminDesigners';
+import { AdminProjects } from '../components/admin/AdminProjects';
+import { AdminServices } from '../components/admin/AdminServices';
+import { AdminPackages } from '../components/admin/AdminPackages';
+import { AdminProofing } from '../components/admin/AdminProofing';
+import { AdminStrategy } from '../components/admin/AdminStrategy';
+import { AdminWiki } from '../components/admin/AdminWiki';
+import { AdminActivityLogs } from '../components/admin/AdminActivityLogs';
 import AdminInvoiceManager from '../components/AdminInvoiceManager';
 import { ContentPlanner } from "../components/ContentPlanner";
 
@@ -82,7 +99,8 @@ const AdminDashboard = () => {
   const [deliveryUrl, setDeliveryUrl] = useState('');
   const [updating, setUpdating] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'messages' | 'users' | 'invoices' | 'planner'>('overview');
+  type AdminTab = 'overview' | 'messages' | 'users' | 'invoices' | 'planner' | 'requests' | 'projects' | 'designers' | 'services' | 'packages' | 'proofing' | 'strategy' | 'wiki' | 'logs';
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [plannerUserId, setPlannerUserId] = useState<string>('');
 
   useEffect(() => {
@@ -220,19 +238,30 @@ const AdminDashboard = () => {
                 : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
             }`}
           >
-            <FileText size={18} />
-            Requests
+            <LayoutDashboard size={18} />
+            Overview
           </button>
           <button 
-            onClick={() => handleTabClick('messages')}
+            onClick={() => handleTabClick('requests')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'messages' 
+              activeTab === 'requests' 
                 ? 'bg-brand-primary text-brand-secondary' 
                 : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
             }`}
           >
-            <MessageSquare size={18} />
-            Inquiries
+            <FileText size={18} />
+            Requests
+          </button>
+          <button 
+            onClick={() => handleTabClick('projects')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'projects' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Briefcase size={18} />
+            Projects
           </button>
           <button 
             onClick={() => handleTabClick('invoices')}
@@ -244,6 +273,17 @@ const AdminDashboard = () => {
           >
             <CreditCard size={18} />
             Invoices
+          </button>
+          <button 
+            onClick={() => handleTabClick('messages')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'messages' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <MessageSquare size={18} />
+            Inquiries
           </button>
           <button 
             onClick={() => handleTabClick('planner')}
@@ -268,7 +308,84 @@ const AdminDashboard = () => {
             }`}
           >
             <Users size={18} />
-            Client Management
+            Clients
+          </button>
+          <button 
+            onClick={() => handleTabClick('designers')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'designers' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Users size={18} />
+            Designers
+          </button>
+          <button 
+            onClick={() => handleTabClick('services')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'services' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Layers size={18} />
+            Services
+          </button>
+          <button 
+            onClick={() => handleTabClick('packages')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'packages' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Layers size={18} />
+            Packages
+          </button>
+          <button 
+            onClick={() => handleTabClick('proofing')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'proofing' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Heart size={18} />
+            Proofing
+          </button>
+          <button 
+            onClick={() => handleTabClick('strategy')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'strategy' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <FileText size={18} />
+            Strategy
+          </button>
+          <button 
+            onClick={() => handleTabClick('wiki')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'wiki' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <BookOpen size={18} />
+            Wiki
+          </button>
+          <button 
+            onClick={() => handleTabClick('logs')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'logs' 
+                ? 'bg-brand-primary text-brand-secondary' 
+                : 'text-black/40 hover:bg-brand-primary hover:text-brand-secondary'
+            }`}
+          >
+            <Activity size={18} />
+            Logs
           </button>
           <Link 
             to="/dashboard"
@@ -319,130 +436,13 @@ const AdminDashboard = () => {
         </header>
 
         {activeTab === 'overview' ? (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl">
-                    <Users size={24} />
-                  </div>
-                  <span className="text-xs font-bold text-green-500 flex items-center gap-1">
-                    <TrendingUp size={12} /> +12%
-                  </span>
-                </div>
-                <h3 className="text-black/40 text-sm font-bold uppercase tracking-widest mb-1">Total Clients</h3>
-                <p className="text-3xl font-bold">{stats?.totalUsers.count || 0}</p>
-              </div>
-              <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-purple-50 text-purple-500 rounded-2xl">
-                    <FileText size={24} />
-                  </div>
-                  <span className="text-xs font-bold text-green-500 flex items-center gap-1">
-                    <TrendingUp size={12} /> +5%
-                  </span>
-                </div>
-                <h3 className="text-black/40 text-sm font-bold uppercase tracking-widest mb-1">Total Requests</h3>
-                <p className="text-3xl font-bold">{stats?.totalRequests.count || 0}</p>
-              </div>
-              <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-yellow-50 text-yellow-600 rounded-2xl">
-                    <Clock size={24} />
-                  </div>
-                </div>
-                <h3 className="text-black/40 text-sm font-bold uppercase tracking-widest mb-1">Pending</h3>
-                <p className="text-3xl font-bold">{stats?.pendingRequests.count || 0}</p>
-              </div>
-            </div>
-
-            {/* Requests Table */}
-            <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-black/5 flex items-center justify-between">
-                <h2 className="font-bold text-xl">Recent Requests</h2>
-                <button className="flex items-center gap-2 text-sm font-bold text-black/40 hover:text-black transition-colors">
-                  <Filter size={16} />
-                  Filter
-                </button>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-black/[0.02] text-[10px] font-bold uppercase tracking-widest text-black/40">
-                      <th className="px-6 py-4">Project & Client</th>
-                      <th className="px-6 py-4">Request Details</th>
-                      <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4">Reviews</th>
-                      <th className="px-6 py-4">Date</th>
-                      <th className="px-6 py-4 text-right">Links</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-black/5">
-                    {requests.map((request) => {
-                      const client = users.find(u => u.id === request.user_id);
-                      const clientName = client?.full_name || client?.email || `User #${request.user_id?.substring(0, 8) || 'Unknown'}`;
-                      
-                      return (
-                        <tr key={request.id} className="hover:bg-black/[0.01] transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex flex-col">
-                              <span className="text-sm font-bold text-brand-primary">{request.project_nr || `REQ-${request.id.substring(0,4)}`}</span>
-                              <span className="text-xs text-black/60 font-medium">{clientName}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="max-w-xs">
-                              <p className="text-sm font-bold truncate">{request.title || request.product_type}</p>
-                              <p className="text-xs text-black/40 truncate">{request.description}</p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <select
-                              value={request.status || 'pending'}
-                              onChange={(e) => handleInlineStatusUpdate(request.id, e.target.value)}
-                              className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border text-center transition-all hover:opacity-80 ${getStatusColor(request.status || 'pending')}`}
-                            >
-                              <option value="Submitted">Ontvangen</option>
-                              <option value="In Design Process">Bezig</option>
-                              <option value="Review">Review</option>
-                              <option value="Delivered">Klaar</option>
-                            </select>
-                          </td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0"
-                              value={request.review_count || 0}
-                              onChange={(e) => handleInlineReviewUpdate(request.id, parseInt(e.target.value) || 0)}
-                              className="w-16 px-3 py-1.5 bg-black/5 border border-transparent rounded-lg text-sm font-bold outline-none focus:border-brand-primary focus:bg-white transition-all text-center"
-                            />
-                          </td>
-                          <td className="px-6 py-4 text-xs text-black/40 font-medium">
-                            {request.created_at ? format(new Date(request.created_at), 'MMM d, yyyy') : 'Unknown Date'}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <button 
-                              onClick={() => {
-                                setSelectedRequest(request);
-                                setNewStatus(request.status);
-                                setDeliveryUrl(request.delivery_url || '');
-                                setNewReviewCount(request.review_count || 0);
-                              }}
-                              className="p-2 hover:bg-black/5 rounded-lg transition-colors"
-                              title="Open Details"
-                            >
-                              <ExternalLink size={18} className="text-black/40" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
+          <AdminOverview />
+        ) : activeTab === 'requests' ? (
+          <AdminRequests />
+        ) : activeTab === 'projects' ? (
+          <AdminProjects />
+        ) : activeTab === 'invoices' ? (
+          <AdminInvoiceManager />
         ) : activeTab === 'messages' ? (
           /* Messages Table */
           <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
@@ -496,8 +496,6 @@ const AdminDashboard = () => {
               </table>
             </div>
           </div>
-        ) : activeTab === 'invoices' ? (
-          <AdminInvoiceManager />
         ) : activeTab === 'planner' ? (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -517,73 +515,30 @@ const AdminDashboard = () => {
               </select>
             </div>
             {plannerUserId ? (
-              <ContentPlanner userId={plannerUserId} isAdmin={true} />
+              <ContentPlanner userId={plannerUserId} isAdmin={true} clients={users.map(u => ({ id: Number(u.id), email: u.email, full_name: u.full_name || null }))} />
             ) : (
               <div className="bg-white p-12 rounded-3xl border border-black/5 shadow-sm text-center text-black/40">
                 Please select a client from the dropdown above to view and edit their content planner.
               </div>
             )}
           </div>
-        ) : (
-          /* Users Table */
-          <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-black/5">
-              <h2 className="font-bold text-xl">Registered Clients</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-black/[0.02] text-[10px] font-bold uppercase tracking-widest text-black/40">
-                    <th className="px-6 py-4">Client</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4">Subscription</th>
-                    <th className="px-6 py-4">Verified</th>
-                    <th className="px-6 py-4">Joined</th>
-                    <th className="px-6 py-4 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-black/5">
-                  {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-black/[0.01] transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold">{u.full_name || u.email}</span>
-                          <span className="text-[10px] text-black/40">{u.full_name ? u.email : `ID: ${u.id.substring(0, 8)}`}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${u.role === 'admin' ? 'bg-brand-primary text-brand-secondary' : 'bg-black/5 text-black/60'}`}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-xs font-medium capitalize">{u.subscription_status}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {u.is_verified ? (
-                          <CheckCircle2 size={16} className="text-green-500" />
-                        ) : (
-                          <Clock size={16} className="text-yellow-500" />
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-black/40 font-medium">
-                        {format(new Date(u.created_at), 'MMM d, yyyy')}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button 
-                          onClick={() => setSelectedUser(u)}
-                          className="p-2 hover:bg-black/5 rounded-lg transition-colors"
-                        >
-                          <MoreVertical size={18} className="text-black/40" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        ) : activeTab === 'users' ? (
+          <AdminClients />
+        ) : activeTab === 'designers' ? (
+          <AdminDesigners />
+        ) : activeTab === 'services' ? (
+          <AdminServices />
+        ) : activeTab === 'packages' ? (
+          <AdminPackages />
+        ) : activeTab === 'proofing' ? (
+          <AdminProofing />
+        ) : activeTab === 'strategy' ? (
+          <AdminStrategy />
+        ) : activeTab === 'wiki' ? (
+          <AdminWiki />
+        ) : activeTab === 'logs' ? (
+          <AdminActivityLogs />
+        ) : null}
       </main>
 
       {/* Request Update Modal */}

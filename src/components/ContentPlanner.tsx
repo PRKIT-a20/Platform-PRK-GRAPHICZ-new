@@ -35,10 +35,10 @@ interface ClientUser {
   full_name: string | null;
 }
 
-export function ContentPlanner({ userId, isAdmin = false }: { userId: string, isAdmin?: boolean }) {
+export function ContentPlanner({ userId, isAdmin = false, clients: propClients }: { userId: string, isAdmin?: boolean, clients?: ClientUser[] }) {
   const [rows, setRows] = useState<ContentPlannerRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [clients, setClients] = useState<ClientUser[]>([]);
+  const [clients, setClients] = useState<ClientUser[]>(propClients || []);
   const [selectedRow, setSelectedRow] = useState<ContentPlannerRow | null>(null);
   
   // Modal / Sidebar Form State
@@ -58,10 +58,16 @@ export function ContentPlanner({ userId, isAdmin = false }: { userId: string, is
   }, [userId]);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && !propClients) {
       fetchClients();
     }
-  }, [isAdmin]);
+  }, [isAdmin, propClients]);
+
+  useEffect(() => {
+    if (propClients) {
+        setClients(propClients);
+    }
+  }, [propClients]);
 
   const fetchPlanner = async () => {
     setLoading(true);
