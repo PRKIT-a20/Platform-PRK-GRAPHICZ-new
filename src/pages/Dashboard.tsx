@@ -40,6 +40,16 @@ import { format } from 'date-fns';
 import ProcessTracker from '../components/ProcessTracker';
 import SmartRequestForm from '../components/SmartRequestForm';
 
+// Client Modular Components (Phase 2B)
+import { ClientOverview } from '../components/ClientOverview';
+import { ClientRequestPanel } from '../components/ClientRequestPanel';
+import { ClientProjectsPanel } from '../components/ClientProjectsPanel';
+import { ClientBrandVault } from '../components/ClientBrandVault';
+import { ClientProofingGallery } from '../components/ClientProofingGallery';
+import { ClientStrategyBoard } from '../components/ClientStrategyBoard';
+import { ClientResourceWiki } from '../components/ClientResourceWiki';
+import { ClientBillingReceipts } from '../components/ClientBillingReceipts';
+
 interface Request {
   id: string;
   project_nr?: string;
@@ -324,225 +334,21 @@ const Dashboard = () => {
             <Loader2 className="animate-spin text-black/20" size={40} />
           </div>
         ) : activeTab === 'overview' ? (
-          <div className="space-y-12">
-            {/* Bento Grid Features */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <button 
-                onClick={() => setActiveTab('planner')}
-                className="md:col-span-2 bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Calendar size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Content Planner</h3>
-                <p className="text-black/40 text-sm font-medium">Schedule and visualize upcoming posts.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('billing')}
-                className="bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <CreditCard size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Billing</h3>
-                <p className="text-black/40 text-sm font-medium">Manage invoices.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('vault')}
-                className="bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Shield size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Brand Vault</h3>
-                <p className="text-black/40 text-sm font-medium">Logos & colors.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('projects')}
-                className="bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Briefcase size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Projects</h3>
-                <p className="text-black/40 text-sm font-medium">Track active work.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('proofing')}
-                className="md:col-span-2 bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ImageIcon size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Proofing Gallery</h3>
-                <p className="text-black/40 text-sm font-medium">Centralized feedback on designs.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('strategy')}
-                className="bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Target size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Strategy</h3>
-                <p className="text-black/40 text-sm font-medium">Brand goals.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('wiki')}
-                className="bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <BookOpen size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Wiki</h3>
-                <p className="text-black/40 text-sm font-medium">Educational guides.</p>
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('roadmap')}
-                className="md:col-span-2 bg-white p-8 rounded-[2.5rem] border border-black/5 hover:shadow-2xl hover:shadow-black/5 transition-all group text-left"
-              >
-                <div className="w-12 h-12 bg-cyan-50 text-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Map size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Process Tracker</h3>
-                <p className="text-black/40 text-sm font-medium">Visual roadmap of the project lifecycle.</p>
-              </button>
-            </div>
-
-              {/* Recent Requests Section */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Recent Requests</h2>
-                <button 
-                  onClick={() => setActiveTab('requests')}
-                  className="text-sm font-bold text-brand-primary hover:underline"
-                >
-                  View all
-                </button>
-              </div>
-              <div className="grid grid-cols-1 gap-4">
-                {requests.slice(0, 3).map((request) => (
-                  <motion.div
-                    key={request.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white p-6 rounded-3xl border border-black/5 flex items-center justify-between hover:shadow-xl hover:shadow-black/5 transition-all"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getStatusColor(request.status || 'pending').split(' ')[0]}`}>
-                        <FileText size={20} />
-                      </div>
-                      <div>
-                        <h3 className="font-bold">{request.title}</h3>
-                        <p className="text-xs text-black/40 font-medium">{request.created_at ? format(new Date(request.created_at), 'MMM d, yyyy') : 'Unknown Date'}</p>
-                      </div>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusColor(request.status || 'pending')}`}>
-                      {(request.status || 'pending').replace('_', ' ')}
-                    </span>
-                  </motion.div>
-                ))}
-                {requests.length === 0 && (
-                  <div className="bg-white p-12 rounded-3xl border border-black/5 text-center">
-                    <p className="text-black/40 font-medium">No requests yet.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <ClientOverview onNavigate={setActiveTab} />
         ) : activeTab === 'requests' ? (
-          <div className="grid grid-cols-1 gap-6">
-            {requests.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl border border-black/5 text-center">
-                <div className="w-16 h-16 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FileText className="text-black/20" size={32} />
-                </div>
-                <h3 className="text-xl font-bold mb-2">No requests yet</h3>
-                <p className="text-black/40 mb-8 max-w-xs mx-auto">Start your first design project by clicking the button above.</p>
-                <button 
-                  onClick={() => setShowNewRequest(true)}
-                  className="text-black font-bold hover:underline"
-                >
-                  Create your first request
-                </button>
-              </div>
-            ) : (
-              requests.map((request) => (
-                <motion.div
-                  key={request.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white p-6 rounded-3xl border border-black/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:shadow-xl hover:shadow-black/5 transition-all"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold">{request.title}</h3>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusColor(request.status || 'pending')}`}>
-                        {(request.status || 'pending').replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className="text-black/50 text-sm line-clamp-1 mb-2">{request.description}</p>
-                    <div className="flex items-center gap-4 text-xs font-medium text-black/30">
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} />
-                        {request.created_at ? format(new Date(request.created_at), 'MMM d, yyyy') : 'Unknown Date'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 w-full md:w-auto">
-                    {request.status === 'delivered' && request.delivery_url && (
-                      <a 
-                        href={request.delivery_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-600 transition-all"
-                      >
-                        <Download size={16} />
-                        Download
-                      </a>
-                    )}
-                    <button 
-                      onClick={() => setInfoMessage({ title: 'Coming Soon', message: 'Chat functionaliteit komt binnenkort!' })}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-black/5 text-black px-4 py-2 rounded-xl font-bold text-sm hover:bg-black/10 transition-all"
-                    >
-                      <MessageSquare size={16} />
-                      Chat
-                    </button>
-                    <button 
-                      onClick={() => setRequestToDelete(request.id)}
-                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-                      title="Delete request"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                    <button 
-                      onClick={() => setInfoMessage({ title: 'Coming Soon', message: 'Details pagina komt binnenkort!' })}
-                      className="p-2 text-black/20 hover:text-black transition-colors"
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
+          <ClientRequestPanel />
+        ) : activeTab === 'projects' ? (
+          <ClientProjectsPanel />
+        ) : activeTab === 'vault' ? (
+          <ClientBrandVault />
+        ) : activeTab === 'proofing' ? (
+          <ClientProofingGallery />
+        ) : activeTab === 'strategy' ? (
+          <ClientStrategyBoard />
+        ) : activeTab === 'wiki' ? (
+          <ClientResourceWiki />
         ) : activeTab === 'billing' ? (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <ClientInvoiceUpload onUploadSuccess={() => setInvoiceRefresh(prev => prev + 1)} />
-              <ClientUploadedInvoicesList refreshTrigger={invoiceRefresh} />
-            </div>
-            <div className="grid grid-cols-1 gap-8">
-              <InvoiceList />
-            </div>
-          </div>
+          <ClientBillingReceipts />
         ) : activeTab === 'roadmap' ? (
           <div className="space-y-8">
             <ProcessTracker userId={user?.id} />
@@ -572,9 +378,12 @@ const Dashboard = () => {
 
             <div className="bg-white p-8 rounded-[2.5rem] border border-black/5">
               <h2 className="text-xl font-bold mb-6">Security</h2>
-              <button className="w-full py-4 bg-black/5 text-black rounded-2xl font-bold hover:bg-black/10 transition-all">
+              <Link 
+                to="/change-password"
+                className="block text-center w-full py-4 bg-black/5 text-[#006663] rounded-2xl font-bold hover:bg-black/10 transition-all"
+              >
                 Change Password
-              </button>
+              </Link>
             </div>
 
             <div className="bg-white p-8 rounded-[2.5rem] border border-black/5">
