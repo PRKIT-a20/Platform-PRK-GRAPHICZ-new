@@ -84,7 +84,7 @@ export const ClientBillingReceipts: React.FC = () => {
     );
   }
 
-  // Calculate quick metrics (sums in cents converted to Euro)
+  // Calculate quick metrics (sums in cents converted to USD)
   const paidSum = invoices.filter(i => i.status === 'paid').reduce((acc, curr) => acc + curr.amount, 0) / 100;
   const pendingSum = invoices.filter(i => i.status === 'pending').reduce((acc, curr) => acc + curr.amount, 0) / 100;
   const overdueSum = invoices.filter(i => i.status === 'overdue').reduce((acc, curr) => acc + curr.amount, 0) / 100;

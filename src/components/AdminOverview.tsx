@@ -9,7 +9,7 @@ import {
   Activity, 
   CheckCircle, 
   AlertTriangle,
-  Euro
+  DollarSign
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -132,7 +132,7 @@ export const AdminOverview: React.FC = () => {
             <p className="text-3xl font-extrabold text-green-600">${stats?.totalRevenue.toFixed(2)} USD</p>
           </div>
           <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
-            <Euro size={20} />
+            <DollarSign size={20} />
           </div>
         </div>
       </div>

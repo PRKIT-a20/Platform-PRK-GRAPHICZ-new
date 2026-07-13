@@ -17,7 +17,7 @@ export const packages = pgTable('packages', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
-  price: integer('price').notNull(), // Cent/Euro amount
+  price: integer('price').notNull(), // Cent/USD amount
   request_limit: integer('request_limit').default(0).notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
 });
@@ -54,7 +54,7 @@ export const invoices = pgTable('invoices', {
   client_id: integer('client_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   subscription_id: uuid('subscription_id').references(() => subscriptions.id, { onDelete: 'set null' }),
   invoice_number: text('invoice_number').notNull(),
-  amount: integer('amount').notNull(), // total price in cents/Euros
+  amount: integer('amount').notNull(), // total price in cents/USDs
   status: text('status').default('unpaid').notNull(), // paid, unpaid, draft, void
   due_date: timestamp('due_date'),
   file_url: text('file_url'),

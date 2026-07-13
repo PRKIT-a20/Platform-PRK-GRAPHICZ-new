@@ -3,7 +3,7 @@ import { apiFetch } from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Briefcase, 
-  Euro, 
+  DollarSign, 
   CheckCircle, 
   Edit, 
   Plus, 
@@ -34,7 +34,7 @@ export const AdminPackages: React.FC = () => {
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
-  const [editPrice, setEditPrice] = useState(0); // in euros
+  const [editPrice, setEditPrice] = useState(0); // in USD
   const [editRequestLimit, setEditRequestLimit] = useState(0);
   const [editRevisionLimit, setEditRevisionLimit] = useState(0);
   const [editSupportTier, setEditSupportTier] = useState('standard');

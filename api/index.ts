@@ -1728,7 +1728,7 @@ app.post('/api/invoices', authenticateToken, requireRole(['admin', 'super_admin'
         payload.client_id,
         'billing',
         'New Invoice Received',
-        `You received a new invoice of €${(payload.amount / 100).toFixed(2)}.`
+        `You received a new invoice of $${(payload.amount / 100).toFixed(2)} USD.`
       );
     } catch (notifErr) {
       console.error("Failed to create notification for invoice:", notifErr);

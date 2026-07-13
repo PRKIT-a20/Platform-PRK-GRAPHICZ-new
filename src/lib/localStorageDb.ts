@@ -80,8 +80,8 @@ export const localDb = {
   storage: {
     from: (bucket: string) => ({
       upload: async (path: string, file: any) => ({ data: { path }, error: null }),
-      getPublicUrl: (path: string) => ({ data: { publicUrl: `https://fake-url.com/${bucket}/${path}` } }),
-      createSignedUrl: async (path: string, num: number) => ({ data: { signedUrl: `https://fake-url.com/${bucket}/${path}` }, error: null }),
+      getPublicUrl: (path: string) => ({ data: { publicUrl: `https://storage.internal.local/${bucket}/${path}` } }),
+      createSignedUrl: async (path: string, num: number) => ({ data: { signedUrl: `https://storage.internal.local/${bucket}/${path}` }, error: null }),
       remove: async (paths: string[]) => ({ data: null, error: null })
     })
   },
