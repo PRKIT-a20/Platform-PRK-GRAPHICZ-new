@@ -69,7 +69,7 @@ export const AdminProjects: React.FC = () => {
     try {
       setLoading(true);
       const [projRes, usersRes] = await Promise.all([
-        apiFetch<Project[]>('/api/admin/projects'),
+        apiFetch<Project[]>('/api/projects'),
         apiFetch<UserRecord[]>('/api/users')
       ]);
       setProjects(projRes.data || []);

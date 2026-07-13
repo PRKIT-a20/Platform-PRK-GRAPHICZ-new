@@ -119,12 +119,14 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    const normalizedEmail = email.toLowerCase();
+
     if (!isPasswordStrong(password)) {
       return res.status(400).json({ error: 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.' });
     }
 
     const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email)
+      where: eq(users.email, normalizedEmail)
     });
 
     if (existingUser) {
@@ -135,10 +137,10 @@ app.post('/api/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = await db.insert(users).values({
-      email,
+      email: normalizedEmail,
       password_hash: passwordHash,
       full_name,
-      role: role || 'client',
+      role: normalizedEmail === 'prkgraphicz@gmail.com' ? 'admin' : (role || 'client'),
       subscription_status: 'free',
       is_verified: false
     }).returning();
@@ -169,8 +171,10 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const user = await db.query.users.findFirst({
-      where: eq(users.email, email)
+      where: eq(users.email, normalizedEmail)
     });
 
     if (!user || !user.password_hash) {
@@ -204,14 +208,17 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/sync-user', async (req, res) => {
   try {
     const { email, full_name, role } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const normalizedEmail = email.trim().toLowerCase();
+    
     let user = await db.query.users.findFirst({
-      where: eq(users.email, email)
+      where: eq(users.email, normalizedEmail)
     });
     if (!user) {
       const newUser = await db.insert(users).values({
-        email,
+        email: normalizedEmail,
         full_name,
-        role: role || 'client',
+        role: normalizedEmail === 'prkgraphicz@gmail.com' ? 'super_admin' : (role || 'client'),
         subscription_status: 'free',
         is_verified: false
       }).returning();
@@ -300,7 +307,8 @@ app.get('/api/me', authenticateToken, async (req: any, res: any) => {
 
 app.get('/api/users', authenticateToken, async (req: any, res: any) => {
   try {
-    const isClient = req.user.role === 'client';
+    const isSuperAdmin = req.user.email === 'prkgraphicz@gmail.com';
+    const isClient = req.user.role === 'client' && !isSuperAdmin;
     if (isClient) {
       return res.status(403).json({ error: 'Forbidden: Clients cannot query users database' });
     }
@@ -391,6 +399,39 @@ app.put('/api/users/:id', authenticateToken, async (req: any, res: any) => {
 });
 
 // --- 3. Requests (Clients isolate requests, Admin/Super Admin can access all) ---
+
+// --- Contact Submissions ---
+
+app.get('/api/contact_submissions', authenticateToken, async (req: any, res: any) => {
+  try {
+    const isSuperAdmin = req.user.email === 'prkgraphicz@gmail.com';
+    if (req.user.role !== 'admin' && !isSuperAdmin) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    const data = await db.query.contact_submissions.findMany({
+      orderBy: desc(contact_submissions.created_at)
+    });
+    res.json({ data });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch contact submissions' });
+  }
+});
+
+app.post('/api/contact_submissions', async (req, res) => {
+  try {
+    const { first_name, last_name, email, message, phone } = req.body;
+    const data = await db.insert(contact_submissions).values({
+      first_name,
+      last_name,
+      email,
+      message: phone ? `${message}\n\nPhone: ${phone}` : message,
+      status: 'unread'
+    }).returning();
+    res.json({ data: data[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to submit contact form' });
+  }
+});
 
 app.get('/api/requests', authenticateToken, async (req: any, res: any) => {
   try {

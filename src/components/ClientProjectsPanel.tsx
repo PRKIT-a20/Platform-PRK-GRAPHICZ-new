@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { localDb } from '../lib/localStorageDb';
+import { apiFetch } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, AlertCircle, Briefcase, ChevronRight, Clock, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -37,13 +37,7 @@ export const ClientProjectsPanel: React.FC = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const { data, error } = await localDb
-        .from('projects')
-        .select('*')
-        .eq('client_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const { data } = await apiFetch('/api/projects');
       setProjects(data || []);
     } catch (err) {
       console.error('Error fetching projects:', err);
@@ -55,15 +49,7 @@ export const ClientProjectsPanel: React.FC = () => {
 
   const fetchActivityLogs = async (projectId: string) => {
     try {
-      const { data, error } = await localDb
-        .from('activity_logs')
-        .select('*')
-        .eq('module', 'projects')
-        // Assuming activity_logs has a project_id column or description references project name
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
+      const { data } = await apiFetch(`/api/activity_logs?project_id=${projectId}`);
       setActivityLogs(data || []);
     } catch (err) {
       console.error('Error fetching activity logs:', err);

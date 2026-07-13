@@ -5,9 +5,10 @@ import { apiFetch } from '../lib/api';
 
 interface ClientInvoice {
   id: string;
-  user_id: string;
+  client_id: number;
+  invoice_number: string;
   file_url: string;
-  status: 'Pending' | 'Paid' | 'Rejected';
+  status: 'paid' | 'unpaid' | 'draft' | 'void';
   amount: number;
   created_at: string;
 }
@@ -32,7 +33,7 @@ export default function AdminInvoiceManager() {
     }
   };
 
-  const handleStatusChange = async (id: string, newStatus: 'Pending' | 'Paid' | 'Rejected') => {
+  const handleStatusChange = async (id: string, newStatus: 'paid' | 'unpaid' | 'draft' | 'void') => {
     setUpdating(id);
     try {
       await apiFetch(`/api/client_invoices/${id}`, {
@@ -77,9 +78,10 @@ export default function AdminInvoiceManager() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Pending': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-      case 'Paid': return 'bg-green-50 text-green-700 border-green-200';
-      case 'Rejected': return 'bg-red-50 text-red-700 border-red-200';
+      case 'unpaid': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'paid': return 'bg-green-50 text-green-700 border-green-200';
+      case 'void': return 'bg-red-50 text-red-700 border-red-200';
+      case 'draft': return 'bg-gray-50 text-gray-700 border-gray-200';
       default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
@@ -94,6 +96,7 @@ export default function AdminInvoiceManager() {
           <thead>
             <tr className="text-black/40 text-sm uppercase tracking-widest font-bold">
               <th className="pb-4">Client ID</th>
+              <th className="pb-4">Invoice No</th>
               <th className="pb-4">Amount</th>
               <th className="pb-4">Date Submitted</th>
               <th className="pb-4">Status</th>
@@ -104,9 +107,12 @@ export default function AdminInvoiceManager() {
             {invoices.map(invoice => (
               <tr key={invoice.id} className="hover:bg-black/[0.01] transition-colors">
                 <td className="py-4 font-medium text-sm text-black/60">
-                  {invoice.user_id.substring(0, 8)}...
+                  {invoice.client_id}
                 </td>
-                <td className="py-4 font-bold">${invoice.amount.toFixed(2)}</td>
+                <td className="py-4 font-medium text-sm text-black/60">
+                  {invoice.invoice_number}
+                </td>
+                <td className="py-4 font-bold">${(invoice.amount / 100).toFixed(2)}</td>
                 <td className="py-4 font-medium text-black/60">
                   {format(new Date(invoice.created_at), 'MMM d, yyyy')}
                 </td>
@@ -117,9 +123,10 @@ export default function AdminInvoiceManager() {
                     disabled={updating === invoice.id}
                     className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border outline-none cursor-pointer ${getStatusColor(invoice.status)}`}
                   >
-                    <option value="Pending">Pending</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="draft">Draft</option>
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                    <option value="void">Void</option>
                   </select>
                 </td>
                 <td className="py-4 text-right">
