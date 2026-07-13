@@ -391,6 +391,9 @@ const AdminDashboard = () => {
             <Activity size={18} />
             Logs
           </button>
+          <div className="pt-4 pb-2 px-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-black/20">Account</p>
+          </div>
           <Link 
             to="/dashboard"
             className="w-full flex items-center gap-3 px-4 py-3 text-black/40 hover:bg-brand-primary hover:text-brand-secondary rounded-xl font-bold text-sm transition-all"
