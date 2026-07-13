@@ -182,11 +182,11 @@ export const BrandVault: React.FC = () => {
     : folders.filter(f => f.parent_id === null);
 
   const getFileIcon = (fileName: string) => {
-    const ext = fileName.split('.').pop()?.toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(ext || '')) {
+    const ext = fileName?.split('.').pop()?.toLowerCase() || '';
+    if (['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(ext)) {
       return <ImageIcon className="text-purple-500" size={18} />;
     }
-    if (['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx'].includes(ext || '')) {
+    if (['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx'].includes(ext)) {
       return <FileText className="text-blue-500" size={18} />;
     }
     return <FileIcon className="text-gray-500" size={18} />;

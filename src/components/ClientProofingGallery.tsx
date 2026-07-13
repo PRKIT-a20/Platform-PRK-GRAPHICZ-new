@@ -485,7 +485,7 @@ export const ClientProofingGallery: React.FC = () => {
                       ? 'bg-green-100 text-green-700 border-green-200' 
                       : 'bg-yellow-100 text-yellow-700 border-yellow-200'
                   }`}>
-                    {gallery.status.replace('_', ' ')}
+                    {gallery.status?.replace('_', ' ') || ''}
                   </span>
                   <ChevronRight size={16} className="text-black/20" />
                 </div>

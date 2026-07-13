@@ -156,7 +156,7 @@ export const AdminOverview: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-black/80 uppercase tracking-wide">
-                    {log.action_type.replace(/_/g, ' ')}
+                    {log.action_type?.replace(/_/g, ' ') || ''}
                   </p>
                   <p className="text-[10px] text-black/40 font-semibold mt-0.5">
                     User ID: #{log.user_id} • {format(new Date(log.created_at), 'MMM d, yyyy h:mm a')}

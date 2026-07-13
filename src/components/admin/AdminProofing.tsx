@@ -240,7 +240,7 @@ export const AdminProofing: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="px-2.5 py-0.5 bg-black/5 text-black/50 border border-black/5 rounded-full text-[9px] font-extrabold uppercase tracking-widest">
-                      {gal.status?.replace(/_/g, ' ')}
+                      {gal.status?.replace(/_/g, ' ') || ''}
                     </span>
                     <span className="text-[10px] text-black/30 font-semibold">
                       {format(new Date(gal.created_at), 'MMM d, yyyy')}

@@ -66,8 +66,8 @@ export const ClientResourceWiki: React.FC = () => {
   // Filter articles by query and category
   const filteredArticles = articles.filter(article => {
     const matchesSearch = 
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.content.toLowerCase().includes(searchQuery.toLowerCase());
+      article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.content?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = selectedCategory ? article.category === selectedCategory : true;
     

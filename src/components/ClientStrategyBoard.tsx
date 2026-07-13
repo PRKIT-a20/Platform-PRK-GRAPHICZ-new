@@ -113,7 +113,7 @@ export const ClientStrategyBoard: React.FC = () => {
 
   // Parse moodboard images (handles comma separated string of URLs)
   const moodboardUrls = selectedBoard?.moodboards
-    ? selectedBoard.moodboards.split(',').map(url => url.trim()).filter(url => url.startsWith('http'))
+    ? selectedBoard.moodboards.split(',').map(url => url?.trim() || '').filter(url => url?.startsWith('http'))
     : [];
 
   return (

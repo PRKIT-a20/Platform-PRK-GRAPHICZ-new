@@ -98,7 +98,7 @@ export const AdminActivityLogs: React.FC = () => {
                   </div>
                   <div>
                     <h5 className="font-bold text-xs uppercase tracking-widest text-black/70">
-                      {log.action_type?.replace(/_/g, ' ')}
+                      {log.action_type?.replace(/_/g, ' ') || ''}
                     </h5>
                     <p className="text-sm font-semibold text-black/50 mt-1">
                       Uitgevoerd door: <span className="text-black/80">{userName}</span>

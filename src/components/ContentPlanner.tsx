@@ -589,7 +589,7 @@ export function ContentPlanner({ userId, isAdmin = false, clients: propClients }
                     {formState.client_id && currentClientDetail && (
                       <div className="mt-2.5 p-3 bg-brand-primary/5 rounded-xl border border-brand-primary/10 flex items-center gap-3 text-xs">
                         <div className="w-7 h-7 rounded-full bg-brand-primary text-brand-secondary flex items-center justify-center font-bold">
-                          {(currentClientDetail.full_name || currentClientDetail.email)[0].toUpperCase()}
+                          {(currentClientDetail.full_name || currentClientDetail.email || '?')[0].toUpperCase()}
                         </div>
                         <div>
                           <p className="font-bold text-black">{currentClientDetail.full_name || 'Unnamed Client'}</p>

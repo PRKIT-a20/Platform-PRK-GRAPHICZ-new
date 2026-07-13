@@ -133,7 +133,7 @@ export const ProofingGallery: React.FC = () => {
                 <img src={item.image_url} alt={item.title} className="w-full h-48 object-cover rounded-xl mb-4" />
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-sm">{item.title}</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${item.status === 'approved' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>{item.status.replace('_', ' ')}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${item.status === 'approved' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>{item.status?.replace('_', ' ') || ''}</span>
                 </div>
               </div>
             ))}

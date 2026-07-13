@@ -321,7 +321,7 @@ const Dashboard = () => {
             </button>
             <div>
               <h1 className="text-3xl font-bold tracking-tight mb-1">
-                {activeTab === 'overview' ? `Welcome, ${user?.email.split('@')[0]}` : activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace(/([A-Z])/g, ' $1')}
+                {activeTab === 'overview' ? `Welcome, ${user?.email?.split('@')[0] || ''}` : activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1).replace(/([A-Z])/g, ' $1') || ''}
               </h1>
               <p className="text-black/40 font-medium">
                 {activeTab === 'overview' ? 'Manage your design requests and assets' : `Access your ${activeTab} tools and information`}
