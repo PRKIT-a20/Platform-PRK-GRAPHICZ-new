@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { format } from 'date-fns';
+import { apiFetch } from '../lib/api';
 import { AdminOverview } from '../components/AdminOverview';
 import { AdminRequests } from '../components/admin/AdminRequests';
 import { AdminClients } from '../components/admin/AdminClients';
@@ -110,9 +111,9 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const [reqRes, contactsRes, usersRes] = await Promise.all([
-        fetch('/api/requests').then(res => res.json()),
-        fetch('/api/contact_submissions').then(res => res.json()),
-        fetch('/api/users').then(res => res.json())
+        apiFetch('/api/requests'),
+        apiFetch('/api/contact_submissions'),
+        apiFetch('/api/users')
       ]);
       
       const reqData = reqRes.data || [];
@@ -141,9 +142,8 @@ const AdminDashboard = () => {
     if (!selectedRequest) return;
     setUpdating(true);
     try {
-      await fetch(`/api/requests/${selectedRequest.id}`, {
+      await apiFetch(`/api/requests/${selectedRequest.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           status: newStatus, 
           delivery_url: deliveryUrl,
@@ -164,9 +164,8 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, status: newStatus as any } : req));
     try {
-      await fetch(`/api/requests/${id}`, {
+      await apiFetch(`/api/requests/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
     } catch (error) {
@@ -179,9 +178,8 @@ const AdminDashboard = () => {
     // Optimistic update
     setRequests(requests.map(req => req.id === id ? { ...req, review_count: newCount } : req));
     try {
-      await fetch(`/api/requests/${id}`, {
+      await apiFetch(`/api/requests/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ review_count: newCount }),
       });
     } catch (error) {
@@ -708,9 +706,8 @@ const AdminDashboard = () => {
                   onClick={async () => {
                     setUpdating(true);
                     try {
-                      await fetch(`/api/users/${selectedUser.id}`, {
+                      await apiFetch(`/api/users/${selectedUser.id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                           role: selectedUser.role, 
                           subscription_status: selectedUser.subscription_status 

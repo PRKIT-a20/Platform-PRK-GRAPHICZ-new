@@ -413,7 +413,7 @@ const Dashboard = () => {
             <div className="w-20 h-20 bg-black/5 rounded-3xl flex items-center justify-center mx-auto mb-8">
               <Loader2 className="text-black/20" size={40} />
             </div>
-            <h3 className="text-2xl font-bold mb-4">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} is coming soon</h3>
+            <h3 className="text-2xl font-bold mb-4">{(activeTab as string).charAt(0).toUpperCase() + (activeTab as string).slice(1)} is coming soon</h3>
             <p className="text-black/40 max-w-md mx-auto font-medium">We're currently building out this feature to provide you with the best possible experience. Stay tuned!</p>
           </div>
         )}

@@ -4,7 +4,7 @@ import { storage } from '../lib/storage';
 interface User {
   id: string;
   email: string;
-  role: 'admin' | 'client';
+  role: 'admin' | 'client' | 'designer' | 'super_admin';
   full_name?: string;
 }
 

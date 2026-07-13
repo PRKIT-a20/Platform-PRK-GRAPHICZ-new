@@ -6,6 +6,7 @@ import {
   Layers, Check, Sparkles, ChevronDown 
 } from 'lucide-react';
 import { storage } from '../lib/storage';
+import { apiFetch } from '../lib/api';
 
 interface ContentPlannerRow {
   id: string;
@@ -72,15 +73,8 @@ export function ContentPlanner({ userId, isAdmin = false, clients: propClients }
   const fetchPlanner = async () => {
     setLoading(true);
     try {
-      const token = storage.get('token');
-      const response = await fetch(`/api/content_planner/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const result = await response.json();
-      const plannerData = result && Array.isArray(result.data) ? result.data : [];
-      setRows(plannerData);
+      const { data } = await apiFetch(`/api/content_planner/${userId}`);
+      setRows(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching content planner:', err);
       setRows([]);
@@ -91,15 +85,8 @@ export function ContentPlanner({ userId, isAdmin = false, clients: propClients }
 
   const fetchClients = async () => {
     try {
-      const token = storage.get('token');
-      const response = await fetch('/api/users', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const result = await response.json();
-      const clientsData = result && Array.isArray(result.data) ? result.data : [];
-      setClients(clientsData);
+      const { data } = await apiFetch('/api/users');
+      setClients(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch clients:', err);
       setClients([]);
@@ -151,33 +138,19 @@ export function ContentPlanner({ userId, isAdmin = false, clients: propClients }
     }
 
     try {
-      const token = storage.get('token');
       const isEditing = !!editingRow;
       const url = isEditing ? `/api/content_planner/${editingRow.id}` : '/api/content_planner';
       const method = isEditing ? 'PUT' : 'POST';
 
-      // Automatically find client name and email for visual updates
-      const selectedClient = Array.isArray(clients) ? clients.find(c => c.id === Number(formState.client_id)) : undefined;
       const payload = {
         ...formState,
-        // Fallback for user_id to match client_id
         user_id: formState.client_id,
       };
 
-      const response = await fetch(url, {
+      const { data } = await apiFetch(url, {
         method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(payload),
       });
-
-      const { data } = await response.json();
-
-      if (!response.ok) {
-        throw new Error('Failed to save planner item');
-      }
 
       const returnedRow = Array.isArray(data) ? data[0] : data;
 
@@ -200,20 +173,12 @@ export function ContentPlanner({ userId, isAdmin = false, clients: propClients }
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this content request?')) return;
     try {
-      const token = storage.get('token');
-      const response = await fetch(`/api/content_planner/${id}`, { 
+      await apiFetch(`/api/content_planner/${id}`, { 
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
-      if (response.ok) {
-        setRows(prev => prev.filter(r => r.id !== id));
-        if (selectedRow?.id === id) {
-          setSelectedRow(null);
-        }
-      } else {
-        alert('Failed to delete item');
+      setRows(prev => prev.filter(r => r.id !== id));
+      if (selectedRow?.id === id) {
+        setSelectedRow(null);
       }
     } catch (err) {
       console.error('Failed to delete', err);

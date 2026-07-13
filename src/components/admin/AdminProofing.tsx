@@ -47,6 +47,7 @@ interface UserRecord {
   id: number;
   email: string;
   full_name: string | null;
+  role: string;
 }
 
 export const AdminProofing: React.FC = () => {

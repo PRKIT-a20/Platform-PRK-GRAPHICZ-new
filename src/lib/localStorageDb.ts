@@ -27,6 +27,10 @@ export const localDb = {
           });
           return chain;
         },
+        limit: (n: number) => {
+          result = result.slice(0, n);
+          return chain;
+        },
         single: () => {
           return Promise.resolve({ data: result[0] || null, error: null });
         },

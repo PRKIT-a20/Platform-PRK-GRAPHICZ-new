@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Loader2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { apiFetch } from '../lib/api';
 
 interface ClientInvoice {
   id: string;
@@ -22,8 +23,7 @@ export default function AdminInvoiceManager() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await fetch('/api/client_invoices');
-      const { data } = await response.json();
+      const { data } = await apiFetch('/api/client_invoices');
       setInvoices(data || []);
     } catch (error) {
       console.error('Failed to fetch invoices:', error);
@@ -35,9 +35,8 @@ export default function AdminInvoiceManager() {
   const handleStatusChange = async (id: string, newStatus: 'Pending' | 'Paid' | 'Rejected') => {
     setUpdating(id);
     try {
-      await fetch(`/api/client_invoices/${id}`, {
+      await apiFetch(`/api/client_invoices/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
       
@@ -59,7 +58,7 @@ export default function AdminInvoiceManager() {
 
     setUpdating(id);
     try {
-      await fetch(`/api/client_invoices/${id}`, {
+      await apiFetch(`/api/client_invoices/${id}`, {
         method: 'DELETE',
       });
       // 3. Update state

@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { motion } from 'motion/react';
 
 interface ClientUser {
   id: number;

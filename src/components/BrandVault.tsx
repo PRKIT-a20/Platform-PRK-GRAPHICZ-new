@@ -100,7 +100,7 @@ export const BrandVault: React.FC = () => {
     let current: BrandFolder | undefined = folder;
     while (current) {
       path.unshift(current);
-      const parentId = current.parent_id;
+      const parentId: string | null = current.parent_id;
       current = parentId ? allFolders.find(f => f.id === parentId) : undefined;
     }
     setBreadcrumbs(path);
