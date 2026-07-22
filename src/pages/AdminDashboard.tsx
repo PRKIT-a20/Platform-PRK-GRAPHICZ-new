@@ -79,7 +79,7 @@ interface UserRecord {
   id: string;
   email: string;
   full_name?: string;
-  role: 'admin' | 'client';
+  role: string;
   subscription_status: 'free' | 'pro' | 'enterprise';
   is_verified: boolean;
   created_at: string;

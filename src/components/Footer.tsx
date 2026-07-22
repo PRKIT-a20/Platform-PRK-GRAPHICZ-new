@@ -26,7 +26,7 @@ const Footer = () => {
             <Logo />
           </Link>
           <p className="text-black/50 text-sm leading-relaxed max-w-xs">
-            Helping startups rise in their graphic design journey. Stop designing, start growing.
+            Strategic branding and design solutions for SMEs. Stop creating, start growing.
           </p>
           <div className="flex items-center gap-4 mt-8">
             <a 
@@ -81,13 +81,17 @@ const Footer = () => {
         <div>
           <h4 className="font-bold text-sm uppercase tracking-widest mb-6 text-black/40">Contact</h4>
           <ul className="flex flex-col gap-4">
-            <li className="flex items-center gap-3 text-sm font-medium">
-              <Mail size={16} className="text-black/40" />
-              prkgraphicz@gmail.com
+            <li>
+              <a href="mailto:prkgraphicz@gmail.com" className="flex items-center gap-3 text-sm font-medium hover:text-black/60 transition-colors">
+                <Mail size={16} className="text-black/40" />
+                prkgraphicz@gmail.com
+              </a>
             </li>
-            <li className="flex items-center gap-3 text-sm font-medium">
-              <Phone size={16} className="text-black/40" />
-              (597) 7174880
+            <li>
+              <a href="tel:+5977174880" className="flex items-center gap-3 text-sm font-medium hover:text-black/60 transition-colors">
+                <Phone size={16} className="text-black/40" />
+                +597 717 4880
+              </a>
             </li>
           </ul>
         </div>

@@ -16,13 +16,13 @@ const About = () => {
             >
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-brand-primary">
                 We believe in <br />
-                <span className="text-brand-secondary font-display uppercase tracking-tighter">Design that Grows</span>
+                <span className="text-brand-secondary font-display uppercase tracking-tighter">Brands that Grow</span>
               </h1>
               <p className="text-xl text-black/80 leading-relaxed mb-8">
-                PRK GRAPHICZ strives to help startups rise in their graphic design journey and focus on the core business that they love to do everyday.
+                PRK Graphicz helps SMEs build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
               </p>
               <p className="text-lg text-black/70 leading-relaxed">
-                Founded by Prechand Angoelal, PRK GRAPHICZ was born out of a passion for creative problem-solving and a vision to make high-quality design accessible to every startup.
+                Founded by Prechand Angoelal, PRK Graphicz was born out of a passion for creative problem-solving and a vision to make high-quality, professional branding and digital transformation accessible to every growing enterprise.
               </p>
             </motion.div>
             <motion.div
@@ -47,7 +47,7 @@ const About = () => {
               </div>
               <h3 className="text-3xl font-bold mb-6 text-[#1a1a1a]">Our Vision</h3>
               <p className="text-lg text-[#1a1a1a]/70 leading-relaxed">
-                That PRK GRAPHICZ strives to help startup to rise in their graphic design journey and focus on the core business that they love to do everyday.
+                To be the strategic creative partner that helps SMEs and growing businesses build strong, credible brands that attract more customers and drive sustainable growth.
               </p>
             </div>
             <div className="p-12 bg-[#fcfcfc] rounded-3xl border border-black/5 shadow-sm">
@@ -56,7 +56,7 @@ const About = () => {
               </div>
               <h3 className="text-3xl font-bold mb-6 text-[#1a1a1a]">Our Mission</h3>
               <p className="text-lg text-[#1a1a1a]/70 leading-relaxed">
-                Making sure our clients experience an uninterruptible communication with us and stay consistent with design made with their vision.
+                Providing comprehensive branding and marketing solutions with clear, seamless communication, ensuring every business asset aligns perfectly with your strategic vision.
               </p>
             </div>
           </div>

@@ -5,43 +5,46 @@ import { motion } from 'motion/react';
 
 const plans = [
   {
-    name: 'Essential',
-    price: '100',
-    description: 'Basic design support for your brand.',
+    name: 'Starter',
+    price: '300',
+    description: 'Designed for startups and small businesses that need a professional brand foundation.',
     features: [
-      '6x Social media designs (any platform)',
-      '2x Holiday post designs',
-      'Email Support',
+      'Professional Logo Design',
+      'Basic Brand Guidelines',
+      'Essential Marketing Materials',
+      'Email Support'
     ],
     cta: 'Choose Plan',
     popular: false,
+    isCustomPrice: false
   },
   {
-    name: 'Standard',
-    price: '200',
-    description: 'Most popular choice for growing businesses.',
+    name: 'Business',
+    price: '1,000',
+    description: 'Designed for growing businesses that need a complete branding and marketing solution.',
     features: [
-      '11x Social media designs (any platform)',
-      '2x Flyers',
-      '3x Holiday designs',
-      'Phone Support',
+      'Comprehensive Brand Strategy',
+      'Advanced Marketing Assets',
+      'Social Media Templates',
+      'Priority Phone Support'
     ],
     cta: 'Choose Plan',
     popular: true,
+    isCustomPrice: false
   },
   {
-    name: 'Advanced',
-    price: '250',
-    description: 'Comprehensive design solutions for power users.',
+    name: 'Enterprise',
+    price: 'Custom',
+    description: 'Custom pricing for tailored solutions and enterprise scale.',
     features: [
-      '10x Social media designs (any platform)',
-      '4x Flyers',
-      '2x Business cards',
-      '4x Holiday designs',
-      'Google Meet Support',
+      'Custom Business Solutions',
+      'Dedicated Account Manager',
+      'Full-Scale Digital Transformation',
+      '24/7 Priority Support'
     ],
-    cta: 'Choose Plan',
+    cta: 'Schedule a Consultation',
     popular: false,
+    isCustomPrice: true
   },
 ];
 
@@ -85,8 +88,14 @@ const Pricing = () => {
 
               <div className="mb-8">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-bold font-display">${plan.price}</span>
-                  <span className={`text-sm font-bold uppercase tracking-widest opacity-80`}>/Month</span>
+                  {plan.isCustomPrice ? (
+                    <span className="text-4xl font-bold font-display">Custom Pricing</span>
+                  ) : (
+                    <>
+                      <span className="text-5xl font-bold font-display">${plan.price}</span>
+                      <span className={`text-sm font-bold uppercase tracking-widest opacity-80`}>/Month</span>
+                    </>
+                  )}
                 </div>
               </div>
 

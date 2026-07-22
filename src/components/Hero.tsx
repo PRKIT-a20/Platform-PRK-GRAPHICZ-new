@@ -19,7 +19,7 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[0.9] text-brand-primary font-display uppercase"
         >
-          Stop Designing <br />
+          Stop Creating <br />
           <span className="text-brand-secondary italic">Start Growing</span>
         </motion.h1>
 
@@ -29,7 +29,7 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-xl text-black/80 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
-          PRK GRAPHICZ strives to help startups rise in their graphic design journey and focus on the core business that they love to do everyday.
+          PRK Graphicz helps SMEs build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
         </motion.p>
 
         <motion.div
@@ -42,7 +42,7 @@ const Hero = () => {
             to="/register"
             className="w-fit px-10 py-4 bg-brand-primary text-brand-secondary rounded-full font-bold text-lg hover:bg-brand-secondary hover:text-brand-primary hover:rounded-xl transition-all flex items-center justify-center gap-2 shadow-2xl shadow-brand-primary/20 group min-w-[220px]"
           >
-            Start a Project
+            Schedule a Consultation
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <Link
@@ -60,9 +60,9 @@ const Hero = () => {
           className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto pt-12 border-t border-black/5"
         >
           {[
-            'Graphic Design',
-            'Social Media',
-            'Branding'
+            'Brand Strategy',
+            'Digital Transformation',
+            'Marketing Support'
           ].map((item) => (
             <div key={item} className="flex items-center justify-center gap-2 text-sm font-bold text-black/60 uppercase tracking-widest">
               <CheckCircle2 size={16} className="text-brand-primary" />

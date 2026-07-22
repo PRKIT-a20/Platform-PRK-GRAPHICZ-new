@@ -7,21 +7,21 @@ import { Link } from 'react-router-dom';
 const Services = () => {
   const allServices = [
     {
-      title: 'Graphic Design',
-      description: 'Creative, professional graphic design solutions for all needs. From logos to brochures, we cover it all.',
-      icon: <Palette size={32} />,
+      title: 'Brand Strategy',
+      description: 'Strategic branding solutions to elevate your business identity and market position.',
+      icon: <Zap size={32} />,
       color: 'bg-brand-primary text-brand-secondary',
     },
     {
-      title: 'Social Media',
-      description: 'Engaging social media content and strategy for growth. We help you stand out in the feed.',
+      title: 'Digital Marketing',
+      description: 'Results-driven marketing campaigns to attract customers and drive growth.',
       icon: <Share2 size={32} />,
       color: 'bg-brand-primary text-brand-secondary',
     },
     {
-      title: 'Branding',
-      description: 'Unique branding solutions to elevate your business identity and create a lasting impression.',
-      icon: <Zap size={32} />,
+      title: 'Professional Design',
+      description: 'Premium design solutions that build credibility and trust with your audience.',
+      icon: <Palette size={32} />,
       color: 'bg-brand-primary text-brand-secondary',
     },
   ];
@@ -36,7 +36,7 @@ const Services = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-brand-primary"
             >
-              Our Services
+              Our Solutions
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -44,7 +44,7 @@ const Services = () => {
               transition={{ delay: 0.1 }}
               className="text-xl text-black/80 max-w-2xl mx-auto"
             >
-              Comprehensive design solutions tailored for startups. We handle the creative, so you can focus on the growth.
+              Comprehensive business solutions tailored for SMEs. We handle the creative strategy, so you can focus on growth.
             </motion.p>
           </div>
 
@@ -76,7 +76,7 @@ const Services = () => {
             <div>
               <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">How it works</h2>
               <p className="text-xl text-white/90 mb-12">
-                Our streamlined process ensures you get high-quality designs without the headache of managing freelancers.
+                Our streamlined process ensures you get high-quality business solutions without the headache of managing freelancers.
               </p>
               <div className="space-y-12 relative">
                 {/* Connecting Line */}
@@ -86,18 +86,18 @@ const Services = () => {
                   { 
                     step: '01', 
                     title: 'Step 1: Choose Your Plan', 
-                    desc: 'Select the plan that fits your brand’s needs.',
-                    note: 'Note: We require a 3-month minimum commitment. Your first month is paid upfront, with subsequent billing occurring on the 26th of each month.'
+                    desc: 'Select the strategic plan that fits your business goals.',
+                    note: 'Note: We require a 3-month minimum commitment for long-term growth. Your first month is paid upfront, with subsequent billing occurring on the 26th of each month.'
                   },
                   { 
                     step: '02', 
-                    title: 'Step 2: Brand Integration & Briefing', 
-                    desc: 'Upload your brand assets (logo, fonts, and colors) and tell us what you need. Simply select the specific services from your chosen plan that you’d like us to prioritize.' 
+                    title: 'Step 2: Brand Integration & Strategy', 
+                    desc: 'Upload your business assets and tell us your objectives. Simply select the specific services from your chosen plan that you’d like us to prioritize for your growth.' 
                   },
                   { 
                     step: '03', 
-                    title: 'Step 3: Receive & Review', 
-                    desc: 'Your custom designs will be delivered based on your personalized Content Planner. You can track progress, download files, and manage your schedule directly through your Client Dashboard.' 
+                    title: 'Step 3: Execution & Review', 
+                    desc: 'Your custom solutions will be delivered based on your personalized strategy. You can track progress, download assets, and manage your campaigns directly through your Client Dashboard.' 
                   },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-8 relative z-10">

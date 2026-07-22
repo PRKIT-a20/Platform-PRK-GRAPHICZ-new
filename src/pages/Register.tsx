@@ -160,7 +160,7 @@ const Register = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-4 bg-black/5 border border-transparent rounded-2xl focus:border-black/10 focus:bg-white transition-all outline-none font-medium"
-                    placeholder="yourname@gmail.com"
+                    placeholder="youremail@example.com"
                   />
                 </div>
               </div>

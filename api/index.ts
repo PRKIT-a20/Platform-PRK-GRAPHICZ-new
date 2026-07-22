@@ -30,8 +30,21 @@ import {
 import { eq, desc, and, or, isNull } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { rateLimit } from 'express-rate-limit';
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
 
 const app = express();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per window
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
@@ -61,7 +74,7 @@ function authenticateToken(req: any, res: any, next: any) {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod', (err: any, decoded: any) => {
+  jwt.verify(token, process.env.JWT_SECRET!, (err: any, decoded: any) => {
     if (err) {
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
@@ -111,9 +124,9 @@ async function createNotification(userId: number, type: string, title: string, m
 
 // --- 1. Authentication & Self-service ---
 
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
   try {
-    const { email, password, full_name, role } = req.body;
+    const { email, password, full_name } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
@@ -140,7 +153,7 @@ app.post('/api/register', async (req, res) => {
       email: normalizedEmail,
       password_hash: passwordHash,
       full_name,
-      role: normalizedEmail === 'prkgraphicz@gmail.com' ? 'admin' : (role || 'client'),
+      role: 'client',
       subscription_status: 'free',
       is_verified: false
     }).returning();
@@ -150,7 +163,7 @@ app.post('/api/register', async (req, res) => {
     
     const token = jwt.sign(
       { id: userToReturn.id, email: userToReturn.email, role: userToReturn.role },
-      process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod',
+      process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
 
@@ -163,7 +176,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     
@@ -189,7 +202,7 @@ app.post('/api/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod',
+      process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
     
@@ -205,7 +218,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.post('/api/sync-user', async (req, res) => {
+app.post('/api/sync-user', authenticateToken, async (req: any, res: any) => {
   try {
     const { email, full_name, role } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -214,20 +227,33 @@ app.post('/api/sync-user', async (req, res) => {
     let user = await db.query.users.findFirst({
       where: eq(users.email, normalizedEmail)
     });
+    
+    const isSuperAdmin = req.user?.role === 'super_admin';
+    
     if (!user) {
+      const assignedRole = (isSuperAdmin && role) ? role : 'client';
+      
       const newUser = await db.insert(users).values({
         email: normalizedEmail,
         full_name,
-        role: normalizedEmail === 'prkgraphicz@gmail.com' ? 'super_admin' : (role || 'client'),
+        role: assignedRole,
         subscription_status: 'free',
         is_verified: false
       }).returning();
       user = newUser[0];
     } else {
-      const updated = await db.update(users).set({ 
-        full_name: full_name || user.full_name,
-        role: role || user.role 
-      }).where(eq(users.id, user.id)).returning();
+      if (!isSuperAdmin && normalizedEmail !== req.user.email.trim().toLowerCase()) {
+        return res.status(403).json({ error: 'Forbidden: You can only update your own user record' });
+      }
+
+      const updateData: any = {
+        full_name: full_name || user.full_name
+      };
+      if (isSuperAdmin && role) {
+        updateData.role = role;
+      }
+      
+      const updated = await db.update(users).set(updateData).where(eq(users.id, user.id)).returning();
       user = updated[0];
     }
     const userToReturn = { ...user };
@@ -840,6 +866,15 @@ app.get('/api/content_planner/:userId', authenticateToken, async (req: any, res:
     // If client, force fetch only their own items
     const targetUserId = isClient ? authUserId : userId;
 
+    if (req.user.role === 'designer') {
+      const projectsCount = await db.query.projects.findMany({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, targetUserId))
+      });
+      if (projectsCount.length === 0) {
+        return res.status(403).json({ error: 'Forbidden: You do not have access to this client\'s content planner' });
+      }
+    }
+
     const data = await db.select({
       id: content_planner.id,
       user_id: content_planner.user_id,
@@ -887,6 +922,15 @@ app.post('/api/content_planner', authenticateToken, async (req: any, res: any) =
 
     if (!clientId) {
       return res.status(400).json({ error: 'client_id is required' });
+    }
+
+    if (req.user.role === 'designer') {
+      const projectsCount = await db.query.projects.findMany({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, clientId))
+      });
+      if (projectsCount.length === 0) {
+        return res.status(403).json({ error: 'Forbidden: You are not assigned to a project for this client' });
+      }
     }
 
     const payload = {
@@ -958,6 +1002,15 @@ app.put('/api/content_planner/:id', authenticateToken, async (req: any, res: any
 
     if (isClient && existing.client_id !== req.user.id && existing.user_id !== String(req.user.id)) {
       return res.status(403).json({ error: 'Forbidden: You do not have permission to update this item' });
+    }
+
+    if (req.user.role === 'designer') {
+      const projectsCount = await db.query.projects.findMany({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, existing.client_id!))
+      });
+      if (projectsCount.length === 0) {
+        return res.status(403).json({ error: 'Forbidden: You are not assigned to a project for this client' });
+      }
     }
 
     const updatePayload: any = {};
@@ -1042,6 +1095,15 @@ app.delete('/api/content_planner/:id', authenticateToken, async (req: any, res: 
       return res.status(403).json({ error: 'Forbidden' });
     }
 
+    if (req.user.role === 'designer') {
+      const projectsCount = await db.query.projects.findMany({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, existing.client_id!))
+      });
+      if (projectsCount.length === 0) {
+        return res.status(403).json({ error: 'Forbidden: You are not assigned to a project for this client' });
+      }
+    }
+
     await db.delete(content_planner).where(eq(content_planner.id, rowId));
     res.json({ success: true });
   } catch (error: any) {
@@ -1093,7 +1155,10 @@ app.post('/api/proofing_galleries', authenticateToken, async (req: any, res: any
     }
 
     // If designer, verify they are assigned to the project
-    if (req.user.role === 'designer' && req.body.project_id) {
+    if (req.user.role === 'designer') {
+      if (!req.body.project_id) {
+        return res.status(400).json({ error: 'project_id is required' });
+      }
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, req.body.project_id)
       });
@@ -1139,7 +1204,10 @@ app.put('/api/proofing_galleries/:id', authenticateToken, async (req: any, res: 
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    if (req.user.role === 'designer' && gallery.project_id) {
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1167,7 +1235,10 @@ app.delete('/api/proofing_galleries/:id', authenticateToken, async (req: any, re
 
     if (req.user.role === 'client') return res.status(403).json({ error: 'Forbidden' });
 
-    if (req.user.role === 'designer' && gallery.project_id) {
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1198,7 +1269,8 @@ app.get('/api/proofing_items', authenticateToken, async (req: any, res: any) => 
     if (req.user.role === 'client' && gallery.client_id !== req.user.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    if (req.user.role === 'designer' && gallery.project_id) {
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1225,7 +1297,8 @@ app.post('/api/proofing_items', authenticateToken, async (req: any, res: any) =>
     if (!gallery) return res.status(404).json({ error: 'Gallery not found' });
 
     if (req.user.role === 'client') return res.status(403).json({ error: 'Forbidden' });
-    if (req.user.role === 'designer' && gallery.project_id) {
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1298,7 +1371,8 @@ app.put('/api/proofing_items/:id', authenticateToken, async (req: any, res: any)
       return res.json({ data: updated[0] });
     }
 
-    if (isDesigner && gallery.project_id) {
+    if (isDesigner) {
+      if (!gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1324,7 +1398,8 @@ app.delete('/api/proofing_items/:id', authenticateToken, async (req: any, res: a
     });
 
     if (req.user.role === 'client') return res.status(403).json({ error: 'Forbidden' });
-    if (req.user.role === 'designer' && gallery && gallery.project_id) {
+    if (req.user.role === 'designer') {
+      if (!gallery || !gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
       const project = await db.query.projects.findFirst({
         where: eq(projects.id, gallery.project_id)
       });
@@ -1343,6 +1418,27 @@ app.get('/api/proofing_versions', authenticateToken, async (req: any, res: any) 
     const itemId = req.query.proofing_item_id;
     if (!itemId) return res.status(400).json({ error: 'proofing_item_id is required' });
 
+    const item = await db.query.proofing_items.findFirst({
+      where: eq(proofing_items.id, String(itemId))
+    });
+    if (!item) return res.status(404).json({ error: 'Proofing item not found' });
+
+    const gallery = await db.query.proofing_galleries.findFirst({
+      where: eq(proofing_galleries.id, item.gallery_id)
+    });
+    if (!gallery) return res.status(404).json({ error: 'Gallery not found' });
+
+    if (req.user.role === 'client' && gallery.client_id !== req.user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
+      const project = await db.query.projects.findFirst({
+        where: eq(projects.id, gallery.project_id)
+      });
+      if (!project || project.designer_id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const data = await db.query.proofing_versions.findMany({
       where: eq(proofing_versions.proofing_item_id, String(itemId)),
       orderBy: desc(proofing_versions.version_number)
@@ -1356,6 +1452,28 @@ app.get('/api/proofing_versions', authenticateToken, async (req: any, res: any) 
 app.post('/api/proofing_versions', authenticateToken, async (req: any, res: any) => {
   try {
     if (req.user.role === 'client') return res.status(403).json({ error: 'Forbidden' });
+    
+    const itemId = req.body.proofing_item_id;
+    if (!itemId) return res.status(400).json({ error: 'proofing_item_id is required' });
+
+    const item = await db.query.proofing_items.findFirst({
+      where: eq(proofing_items.id, String(itemId))
+    });
+    if (!item) return res.status(404).json({ error: 'Proofing item not found' });
+
+    const gallery = await db.query.proofing_galleries.findFirst({
+      where: eq(proofing_galleries.id, item.gallery_id)
+    });
+    if (!gallery) return res.status(404).json({ error: 'Gallery not found' });
+
+    if (req.user.role === 'designer') {
+      if (!gallery.project_id) return res.status(403).json({ error: 'Forbidden' });
+      const project = await db.query.projects.findFirst({
+        where: eq(projects.id, gallery.project_id)
+      });
+      if (!project || project.designer_id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const payload = {
       ...req.body,
       uploaded_by: req.user.id
@@ -1407,6 +1525,13 @@ app.post('/api/brand_folders', authenticateToken, async (req: any, res: any) => 
       targetClientId = Number(req.body.client_id);
     }
 
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, targetClientId))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden: You are not assigned to this client' });
+    }
+
     const payload = {
       name: req.body.name,
       client_id: targetClientId,
@@ -1431,6 +1556,13 @@ app.put('/api/brand_folders/:id', authenticateToken, async (req: any, res: any) 
       return res.status(403).json({ error: 'Forbidden' });
     }
 
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, folder.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const updated = await db.update(brand_folders).set(req.body).where(eq(brand_folders.id, req.params.id)).returning();
     res.json({ data: updated[0] });
   } catch (error) {
@@ -1447,6 +1579,13 @@ app.delete('/api/brand_folders/:id', authenticateToken, async (req: any, res: an
 
     if (req.user.role === 'client' && folder.client_id !== req.user.id) {
       return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, folder.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
     }
 
     await db.delete(brand_folders).where(eq(brand_folders.id, req.params.id));
@@ -1470,6 +1609,13 @@ app.get('/api/brand_files', authenticateToken, async (req: any, res: any) => {
     // Enforce folder access rules
     if (req.user.role === 'client' && folder.client_id !== req.user.id) {
       return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, folder.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
     }
 
     let filesList;
@@ -1514,6 +1660,13 @@ app.post('/api/brand_files', authenticateToken, async (req: any, res: any) => {
 
     if (!folder) return res.status(404).json({ error: 'Folder not found' });
 
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, folder.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const isClient = req.user.role === 'client';
     if (isClient) {
       if (folder.client_id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
@@ -1546,6 +1699,13 @@ app.delete('/api/brand_files/:id', authenticateToken, async (req: any, res: any)
 
     if (req.user.role === 'client' && folder && folder.client_id !== req.user.id) {
       return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    if (req.user.role === 'designer' && folder) {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, folder.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
     }
 
     await db.delete(brand_files).where(eq(brand_files.id, req.params.id));
@@ -1587,9 +1747,18 @@ app.get('/api/conversations', authenticateToken, async (req: any, res: any) => {
 
 app.post('/api/conversations', authenticateToken, async (req: any, res: any) => {
   try {
+    const targetClientId = req.user.role === 'client' ? req.user.id : Number(req.body.client_id);
+    
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, targetClientId))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden: You are not assigned to this client' });
+    }
+
     const payload = {
       ...req.body,
-      client_id: req.user.role === 'client' ? req.user.id : Number(req.body.client_id)
+      client_id: targetClientId
     };
     const newRow = await db.insert(conversations).values(payload).returning();
     res.json({ data: newRow });
@@ -1778,8 +1947,20 @@ app.post('/api/payments', authenticateToken, async (req: any, res: any) => {
 
     const newPayment = await db.insert(payments).values(payload).returning();
 
-    // Mark invoice as paid
-    await db.update(invoices).set({ status: 'paid' }).where(eq(invoices.id, invoice_id));
+    // Calculate cumulative paid amount for the invoice (including the new payment)
+    const allPayments = await db.query.payments.findMany({
+      where: and(
+        eq(payments.invoice_id, invoice_id),
+        eq(payments.status, 'completed')
+      )
+    });
+    const cumulativePaid = allPayments.reduce((sum, p) => sum + p.amount, 0);
+
+    const isPaid = cumulativePaid >= invoice.amount;
+    const newInvoiceStatus = isPaid ? 'paid' : 'partially_paid';
+
+    // Update invoice status based on cumulative payments
+    await db.update(invoices).set({ status: newInvoiceStatus }).where(eq(invoices.id, invoice_id));
     
     await logActivity(req.user.id, 'register_payment', 'billing', `Payment processed successfully for invoice ${invoice_id}`);
     
@@ -1859,12 +2040,26 @@ app.post('/api/services', authenticateToken, requireRole(['super_admin']), async
 
 app.get('/api/strategy_boards', authenticateToken, async (req: any, res: any) => {
   try {
-    let data;
+    let data: any[] = [];
     if (req.user.role === 'client') {
       data = await db.query.strategy_boards.findMany({
         where: eq(strategy_boards.client_id, req.user.id),
         orderBy: desc(strategy_boards.created_at)
       });
+    } else if (req.user.role === 'designer') {
+      const designerProjects = await db.query.projects.findMany({
+        where: eq(projects.designer_id, req.user.id)
+      });
+      const clientIds = Array.from(new Set(designerProjects.map(p => p.client_id).filter(Boolean))) as number[];
+      
+      if (clientIds.length === 0) {
+        data = [];
+      } else {
+        data = await db.select()
+          .from(strategy_boards)
+          .where(or(...clientIds.map(id => eq(strategy_boards.client_id, id))))
+          .orderBy(desc(strategy_boards.created_at));
+      }
     } else {
       data = await db.query.strategy_boards.findMany({
         orderBy: desc(strategy_boards.created_at)
@@ -1878,6 +2073,15 @@ app.get('/api/strategy_boards', authenticateToken, async (req: any, res: any) =>
 
 app.post('/api/strategy_boards', authenticateToken, requireRole(['admin', 'super_admin', 'designer']), async (req: any, res: any) => {
   try {
+    if (req.user.role === 'designer') {
+      if (!req.body.client_id) return res.status(400).json({ error: 'client_id is required' });
+      const targetClientId = Number(req.body.client_id);
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, targetClientId))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden: You are not assigned to this client' });
+    }
+
     const newRow = await db.insert(strategy_boards).values(req.body).returning();
     res.json({ data: newRow });
   } catch (error) {
@@ -1894,6 +2098,13 @@ app.put('/api/strategy_boards/:id', authenticateToken, async (req: any, res: any
 
     if (req.user.role === 'client' && existing.client_id !== req.user.id) {
       return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    if (req.user.role === 'designer') {
+      const project = await db.query.projects.findFirst({
+        where: and(eq(projects.designer_id, req.user.id), eq(projects.client_id, existing.client_id))
+      });
+      if (!project) return res.status(403).json({ error: 'Forbidden' });
     }
 
     const updated = await db.update(strategy_boards).set(req.body).where(eq(strategy_boards.id, req.params.id)).returning();
@@ -1981,9 +2192,17 @@ app.get('/api/activity_logs', authenticateToken, requireRole(['admin', 'super_ad
 // Retro-compatible requests lists for invoice tables mapping
 app.get('/api/client_invoices', authenticateToken, async (req: any, res: any) => {
   try {
-    const data = await db.query.invoices.findMany({
-      orderBy: desc(invoices.created_at)
-    });
+    let data;
+    if (req.user.role === 'client') {
+      data = await db.query.invoices.findMany({
+        where: eq(invoices.client_id, req.user.id),
+        orderBy: desc(invoices.created_at)
+      });
+    } else {
+      data = await db.query.invoices.findMany({
+        orderBy: desc(invoices.created_at)
+      });
+    }
     res.json({ data });
   } catch (error) {
     res.status(500).json({ data: [] });
