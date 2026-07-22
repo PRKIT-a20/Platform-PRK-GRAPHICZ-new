@@ -29,7 +29,7 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-xl text-black/80 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
-          PRK Graphicz helps SMEs build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
+          PRK Graphicz helps Small and Medium Enterprises (SMEs) build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
         </motion.p>
 
         <motion.div

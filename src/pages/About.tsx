@@ -19,7 +19,7 @@ const About = () => {
                 <span className="text-brand-secondary font-display uppercase tracking-tighter">Brands that Grow</span>
               </h1>
               <p className="text-xl text-black/80 leading-relaxed mb-8">
-                PRK Graphicz helps SMEs build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
+                PRK Graphicz helps Small and Medium Enterprises (SMEs) build brands that generate growth, trust, and long-term success. Focus on scaling your business while we handle your strategic creative needs.
               </p>
               <p className="text-lg text-black/70 leading-relaxed">
                 Founded by Prechand Angoelal, PRK Graphicz was born out of a passion for creative problem-solving and a vision to make high-quality, professional branding and digital transformation accessible to every growing enterprise.
@@ -47,7 +47,7 @@ const About = () => {
               </div>
               <h3 className="text-3xl font-bold mb-6 text-[#1a1a1a]">Our Vision</h3>
               <p className="text-lg text-[#1a1a1a]/70 leading-relaxed">
-                To be the strategic creative partner that helps SMEs and growing businesses build strong, credible brands that attract more customers and drive sustainable growth.
+                To be the strategic creative partner that helps Small and Medium Enterprises (SMEs) and growing businesses build strong, credible brands that attract more customers and drive sustainable growth.
               </p>
             </div>
             <div className="p-12 bg-[#fcfcfc] rounded-3xl border border-black/5 shadow-sm">

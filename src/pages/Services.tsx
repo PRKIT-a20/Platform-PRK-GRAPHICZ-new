@@ -44,7 +44,7 @@ const Services = () => {
               transition={{ delay: 0.1 }}
               className="text-xl text-black/80 max-w-2xl mx-auto"
             >
-              Comprehensive business solutions tailored for SMEs. We handle the creative strategy, so you can focus on growth.
+              Comprehensive business solutions tailored for Small and Medium Enterprises (SMEs). We handle the creative strategy, so you can focus on growth.
             </motion.p>
           </div>
 
@@ -74,7 +74,7 @@ const Services = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <div>
-              <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">How it works</h2>
+              <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">We help</h2>
               <p className="text-xl text-white/90 mb-12">
                 Our streamlined process ensures you get high-quality business solutions without the headache of managing freelancers.
               </p>

@@ -26,7 +26,7 @@ const Footer = () => {
             <Logo />
           </Link>
           <p className="text-black/50 text-sm leading-relaxed max-w-xs">
-            Strategic branding and design solutions for SMEs. Stop creating, start growing.
+            Strategic branding and design solutions for Small and Medium Enterprises (SMEs). Stop creating, start growing.
           </p>
           <div className="flex items-center gap-4 mt-8">
             <a 

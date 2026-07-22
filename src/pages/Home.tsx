@@ -34,7 +34,7 @@ const Home = () => {
       <section className="py-24 px-6 bg-white" id="services">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">How we help SMEs</h2>
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">We help Small and Medium Enterprises (SMEs)</h2>
             <p className="text-xl text-black/60 leading-relaxed">
               We specialize in crafting highly personalized and strategic solutions specifically for growing businesses and enterprises.
             </p>
